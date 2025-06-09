@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оптимизация авиамаршрутов для почтовых отправлений</title>
+    <style>
+        :root {
+            --primary-color: #0054a6; /* Основной синий цвет */
+            --secondary-color: #e6f0fa; /* Светло-синий фон */
+            --text-color: #333; /* Основной цвет текста */
+            --light-text: #666; /* Светлый текст */
+            --border-radius: 8px; /* Скругление углов */
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тень элементов */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: white;
+            padding: 20px 0;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--light-text);
+        }
+
+        .app-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .visualization-section {
+            flex: 2;
+            min-width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #003d7a;
+        }
+
+        .delivery-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .delivery-item select {
+            flex: 2;
+        }
+
+        .delivery-item input {
+            flex: 1;
+        }
+
+        .remove-btn {
+            flex: 0 0 40px;
+            background-color: #ff4444;
+        }
+
+        .add-btn {
+            margin-top: 0;
+            background-color: #4CAF50;
+        }
+
+        .add-btn:hover {
+            background-color: #3e8e41;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .city-label {
+            position: absolute;
+            font-size: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+        .route-line {
+            position: absolute;
+            height: 2px;
+            background-color: var(--primary-color);
+            transform-origin: left center;
+            z-index: 1;
+        }
+
+        .plane-icon {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #ff5722;
+            border-radius: 50%;
+            z-index: 2;
+            transform: translate(-50%, -50%);
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+        }
+
+        .result-item strong {
+            color: var(--primary-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Почта России - Оптимизация авиамаршрутов</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Оптимизация маршрутов авиарейсов для почтовых отправлений</h1>
+        <p class="description">Используйте роевой интеллект для построения оптимальных маршрутов доставки почтовых отправлений</p>
+
+        <div class="app-container">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="start-city">Город отправления:</label>
+                    <select id="start-city">
+                        <!-- Города будут добавлены через JS -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Пункты назначения и вес отправлений (кг):</label>
+                    <div id="deliveries-container">
+                        <div class="delivery-item">
+                            <select class="destination-city">
+                                <!-- Города будут добавлены через JS -->
+                            </select>
+                            <input type="number" class="weight" min="1" value="100" placeholder="Вес">
+                            <button class="remove-btn">×</button>
+                        </div>
+                    </div>
+                    <button id="add-destination" class="add-btn">+ Добавить пункт</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="plane-capacity">Грузоподъемность самолета (кг):</label>
+                    <input type="number" id="plane-capacity" min="100" value="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="algorithm">Алгоритм оптимизации:</label>
+                    <select id="algorithm">
+                        <option value="pso">Роевой алгоритм (PSO)</option>
+                        <option value="aco">Муравьиный алгоритм</option>
+                    </select>
+                </div>
+
+                <button id="build-route">Построить маршрут</button>
+            </div>
+
+            <div class="visualization-section">
+                <div id="map"></div>
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Идет расчет оптимального маршрута...</p>
+                </div>
+                <div id="results" class="results hidden">
+                    <h3>Результаты оптимизации маршрута</h3>
+                    <div class="result-item"><strong>Общий вес:</strong> <span id="total-weight">0</span> кг</div>
+                    <div class="result-item"><strong>Количество рейсов:</strong> <span id="flights-count">0</span></div>
+                    <div class="result-item"><strong>Общее расстояние:</strong> <span id="total-distance">0</span> км</div>
+                    <div class="result-item"><strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов</div>
+                    <div class="result-item"><strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.</div>
+                    <div class="result-item"><strong>Оптимальный маршрут:</strong> <span id="optimal-route"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // База данных городов с их координатами (для визуализации)
+        const cities = [
+            { name: "Москва", lat: 55.7558, lng: 37.6173, airport: "Шереметьево" },
+            { name: "Санкт-Петербург", lat: 59.9343, lng: 30.3351, airport: "Пулково" },
+            { name: "Новосибирск", lat: 55.0084, lng: 82.9357, airport: "Толмачёво" },
+            { name: "Екатеринбург", lat: 56.8389, lng: 60.6057, airport: "Кольцово" },
+            { name: "Казань", lat: 55.7961, lng: 49.1064, airport: "Казань" },
+            { name: "Нижний Новгород", lat: 56.3269, lng: 44.0065, airport: "Стригино" },
+            { name: "Челябинск", lat: 55.1644, lng: 61.4368, airport: "Баландино" },
+            { name: "Самара", lat: 53.1951, lng: 50.1018, airport: "Курумоч" },
+            { name: "Омск", lat: 54.9914, lng: 73.3645, airport: "Омск" },
+            { name: "Ростов-на-Дону", lat: 47.2224, lng: 39.7187, airport: "Платов" },
+            { name: "Уфа", lat: 54.7351, lng: 55.9587, airport: "Уфа" },
+            { name: "Красноярск", lat: 56.0184, lng: 92.8672, airport: "Емельяново" },
+            { name: "Пермь", lat: 58.0105, lng: 56.2294, airport: "Большое Савино" },
+            { name: "Воронеж", lat: 51.672, lng: 39.1843, airport: "Воронеж" },
+            { name: "Волгоград", lat: 48.7071, lng: 44.5169, airport: "Гумрак" },
+            { name: "Краснодар", lat: 45.0355, lng: 38.9753, airport: "Пашковский" },
+            { name: "Саратов", lat: 51.5336, lng: 46.0343, airport: "Гагарин" },
+            { name: "Тюмень", lat: 57.1522, lng: 65.5272, airport: "Рощино" },
+            { name: "Тольятти", lat: 53.5078, lng: 49.4204, airport: "Курумоч" },
+            { name: "Ижевск", lat: 56.8527, lng: 53.2115, airport: "Ижевск" }
+        ];
+
+        // Матрица расстояний между городами (в км)
+        // В реальном приложении можно было бы вычислять расстояния по координатам
+        const distanceMatrix = {};
+
+        // Инициализация матрицы расстояний
+        function initDistanceMatrix() {
+            for (let i = 0; i < cities.length; i++) {
+                distanceMatrix[cities[i].name] = {};
+                for (let j = 0; j < cities.length; j++) {
+                    if (i === j) {
+                        distanceMatrix[cities[i].name][cities[j].name] = 0;
+                    } else {
+                        // Вычисляем примерное расстояние по координатам (упрощенная формула)
+                        const lat1 = cities[i].lat;
+                        const lng1 = cities[i].lng;
+                        const lat2 = cities[j].lat;
+                        const lng2 = cities[j].lng;
+                        
+                        // Формула гаверсинусов для расчета расстояния между точками на сфере
+                        const R = 6371; // Радиус Земли в км
+                        const dLat = (lat2 - lat1) * Math.PI / 180;
+                        const dLng = (lng2 - lng1) * Math.PI / 180;
+                        const a = 
+                            Math.sin(dLat/2) * Math.sin(dLat/2) +
+                            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                            Math.sin(dLng/2) * Math.sin(dLng/2);
+                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                        const distance = R * c;
+                        
+                        distanceMatrix[cities[i].name][cities[j].name] = Math.round(distance);
+                    }
+                }
+            }
+        }
+
+        // Инициализация интерфейса
+        function initUI() {
+            const startCitySelect = document.getElementById('start-city');
+            const destinationSelect = document.querySelector('.destination-city');
+            
+            // Заполняем выпадающие списки городами
+            cities.forEach(city => {
+                const option1 = document.createElement('option');
+                option1.value = city.name;
+                option1.textContent = city.name;
+                startCitySelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = city.name;
+                option2.textContent = city.name;
+                destinationSelect.appendChild(option2.cloneNode(true));
+            });
+            
+            // Устанавливаем Москву по умолчанию
+            startCitySelect.value = "Москва";
+            
+            // Обработчик добавления нового пункта назначения
+            document.getElementById('add-destination').addEventListener('click', () => {
+                const container = document.getElementById('deliveries-container');
+                const newItem = document.querySelector('.delivery-item').cloneNode(true);
+                newItem.querySelector('.weight').value = '100';
+                container.appendChild(newItem);
+                
+                // Добавляем обработчик удаления для новой кнопки
+                newItem.querySelector('.remove-btn').addEventListener('click', () => {
+                    if (document.querySelectorAll('.delivery-item').length > 1) {
+                        container.removeChild(newItem);
+                    } else {
+                        alert('Должен остаться хотя бы один пункт назначения');
+                    }
+                });
+            });
+            
+            // Обработчик удаления для первой кнопки
+            document.querySelector('.remove-btn').addEventListener('click', (e) => {
+                if (document.querySelectorAll('.delivery-item').length > 1) {
+                    e.target.closest('.delivery-item').remove();
+                } else {
+                    alert('Должен остаться хотя бы один пункт назначения');
+                }
+            });
+            
+            // Обработчик построения маршрута
+            document.getElementById('build-route').addEventListener('click', buildRoute);
+            
+            // Инициализируем карту
+            initMap();
+        }
+
+        // Инициализация карты для визуализации
+        function initMap() {
+            const map = document.getElementById('map');
+            const width = map.offsetWidth;
+            const height = map.offsetHeight;
+            
+            // Находим минимальные и максимальные координаты для масштабирования
+            const lngs = cities.map(city => city.lng);
+            const lats = cities.map(city => city.lat);
+            const minLng = Math.min(...lngs);
+            const maxLng = Math.max(...lngs);
+            const minLat = Math.min(...lats);
+            const maxLat = Math.max(...lats);
+            
+            // Функция для преобразования координат в пиксели на карте
+            function project(lng, lat) {
+                const x = ((lng - minLng) / (maxLng - minLng)) * (width - 40) + 20;
+                const y = height - ((lat - minLat) / (maxLat - minLat)) * (height - 40) - 20;
+                return { x, y };
+            }
+            
+            // Добавляем города на карту
+            cities.forEach(city => {
+                const pos = project(city.lng, city.lat);
+                
+                // Точка города
+                const point = document.createElement('div');
+                point.className = 'city-point';
+                point.style.left = `${pos.x}px`;
+                point.style.top = `${pos.y}px`;
+                point.setAttribute('data-city', city.name);
+                map.appendChild(point);
+                
+                // Название города
+                const label = document.createElement('div');
+                label.className = 'city-label';
+                label.textContent = city.name;
+                label.style.left = `${pos.x + 10}px`;
+                label.style.top = `${pos.y - 10}px`;
+                map.appendChild(label);
+            });
+            
+            // Сохраняем функцию проекции для использования в других функциях
+            map.project = project;
+        }
+
+        // Роевой алгоритм оптимизации (Particle Swarm Optimization)
+        function psoAlgorithm(startCity, destinations, planeCapacity) {
+            // Параметры алгоритма
+            const swarmSize = 50;
+            const iterations = 100;
+            const inertia = 0.7;
+            const cognitiveWeight = 1.5;
+            const socialWeight = 1.5;
+            
+            // Преобразуем destinations в массив объектов {city, weight}
+            const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
+                city: item.querySelector('.destination-city').value,
+                weight: parseInt(item.querySelector('.weight').value)
+            }));
+            
+            // Все города, которые нужно посетить (без дубликатов и без стартового города)
+            const uniqueCities = [...new Set(deliveries.map(d => d.city))].filter(city => city !== startCity);
+            
+            // Генерация случайного маршрута (только промежуточные города)
+            function randomRoute() {
+                const route = [...uniqueCities];
+                for (let i = route.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [route[i], route[j]] = [route[j], route[i]];
+                }
+                return route;
+            }
+            
+            // Расчет стоимости маршрута (чем меньше, тем лучше)
+            function calculateCost(intermediateRoute) {
+                // Полный маршрут: стартовый город -> промежуточные -> стартовый
+                const fullRoute = [startCity, ...intermediateRoute, startCity];
+                
+                let totalDistance = 0;
+                for (let i = 0; i < fullRoute.length - 1; i++) {
+                    totalDistance += distanceMatrix[fullRoute[i]][fullRoute[i+1]];
+                }
+                
+                // Разделяем доставки на рейсы с учетом грузоподъемности
+                let flights = [];
+                let currentFlight = { cities: [startCity], weight: 0 };
+                
+                for (const city of intermediateRoute) {
+                    const cityWeight = deliveries.filter(d => d.city === city).reduce((sum, d) => sum + d.weight, 0);
+                    
+                    if (currentFlight.weight + cityWeight <= planeCapacity) {
+                        currentFlight.cities.push(city);
+                        currentFlight.weight += cityWeight;
+                    } else {
+                        // Завершаем текущий рейс и начинаем новый
+                        currentFlight.cities.push(startCity);
+                        flights.push(currentFlight);
+                        currentFlight = { cities: [startCity, city], weight: cityWeight };
+                    }
+                }
+                
+                // Добавляем последний рейс
+                if (currentFlight.cities.length > 1) {
+                    currentFlight.cities.push(startCity);
+                    flights.push(currentFlight);
+                }
+                
+                // Штрафуем за количество рейсов (чтобы алгоритм старался минимизировать их)
+                const flightsPenalty = flights.length * 500; // 500 км штрафа за каждый дополнительный рейс
+                
+                return totalDistance + flightsPenalty;
+            }
+            
+            // Инициализация роя
+            let swarm = [];
+            let globalBest = { route: null, cost: Infinity };
+            
+            for (let i = 0; i < swarmSize; i++) {
+                const intermediateRoute = randomRoute();
+                const cost = calculateCost(intermediateRoute);
+                
+                const particle = {
+                    route: intermediateRoute,
+                    cost: cost,
+                    bestRoute: [...intermediateRoute],
+                    bestCost: cost,
+                    velocity: Array(intermediateRoute.length).fill(0)
+                };
+                
+                swarm.push(particle);
+                
+                if (cost < globalBest.cost) {
+                    globalBest.route = [...intermediateRoute];
+                    globalBest.cost = cost;
+                }
+            }
+            
+            // Основной цикл алгоритма
+            for (let iter = 0; iter < iterations; iter++) {
+                for (const particle of swarm) {
+                    // Обновляем скорость
+                    for (let i = 0; i < particle.velocity.length; i++) {
+                        const r1 = Math.random();
+                        const r2 = Math.random();
+                        
+                        particle.velocity[i] = inertia * particle.velocity[i] +
+                            cognitiveWeight * r1 * (particle.bestRoute[i] !== particle.route[i] ? 1 : 0) +
+                            socialWeight * r2 * (globalBest.route[i] !== particle.route[i] ? 1 : 0);
+                    }
+                    
+                    // Обновляем позицию (маршрут)
+                    const newRoute = [...particle.route];
+                    for (let i = 0; i < newRoute.length; i++) {
+                        if (Math.random() < particle.velocity[i]) {
+                            // Случайным образом меняем местами два города
+                            const j = Math.floor(Math.random() * newRoute.length);
+                            [newRoute[i], newRoute[j]] = [newRoute[j], newRoute[i]];
+                        }
+                    }
+                    
+                    // Проверяем новый маршрут
+                    const newCost = calculateCost(newRoute);
+                    
+                    if (newCost < particle.bestCost) {
+                        particle.bestRoute = [...newRoute];
+                        particle.bestCost = newCost;
+                    }
+                    
+                    if (newCost < globalBest.cost) {
+                        globalBest.route = [...newRoute];
+                        globalBest.cost = newCost;
+                    }
+                    
+                    particle.route = newRoute;
+                    particle.cost = newCost;
+                }
+            }
+            
+            // Возвращаем полный маршрут: стартовый город -> оптимальные промежуточные -> стартовый
+            return [startCity, ...globalBest.route, startCity];
+        }
+        
+        // Построение маршрута
+        function buildRoute() {
+            const startCity = document.getElementById('start-city').value;
+            const planeCapacity = parseInt(document.getElementById('plane-capacity').value);
+            const algorithm = document.getElementById('algorithm').value;
+            
+            // Показываем индикатор загрузки
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            
+            // Очищаем предыдущие маршруты на карте
+            clearMap();
+            
+            // Имитируем задержку вычислений для демонстрации
+            setTimeout(() => {
+                let optimalRoute;
+                
+                if (algorithm === 'pso') {
+                    optimalRoute = psoAlgorithm(startCity, [], planeCapacity);
+                } else {
+                    // Простой жадный алгоритм как запасной вариант
+                    optimalRoute = greedyAlgorithm(startCity, [], planeCapacity);
+                }
+                
+                // Визуализируем маршрут
+                visualizeRoute(optimalRoute);
+                
+                // Рассчитываем и показываем результаты
+                showResults(optimalRoute, planeCapacity);
+                
+                // Скрываем индикатор загрузки
+                document.getElementById('loading').classList.add('hidden');
+            }, 1500);
+        }
+
+        // Простой жадный алгоритм (в качестве альтернативы)
+        function greedyAlgorithm(startCity, destinations, planeCapacity) {
+            const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
+                city: item.querySelector('.destination-city').value,
+                weight: parseInt(item.querySelector('.weight').value)
+            }));
+            
+            const uniqueCities = [...new Set(deliveries.map(d => d.city))];
+            
+            // Просто сортируем города по расстоянию от стартового
+            const sortedCities = [...uniqueCities].sort((a, b) => {
+                return distanceMatrix[startCity][a] - distanceMatrix[startCity][b];
+            });
+            
+            return [startCity, ...sortedCities, startCity];
+        }
+
+        // Очистка карты от предыдущих маршрутов
+        function clearMap() {
+            const map = document.getElementById('map');
+            const lines = map.querySelectorAll('.route-line, .plane-icon');
+            lines.forEach(el => el.remove());
+        }
+
+        // Визуализация маршрута на карте
+        function visualizeRoute(route) {
+            const map = document.getElementById('map');
+            const project = map.project;
+            
+            // Рисуем линии маршрута
+            for (let i = 0; i < route.length - 1; i++) {
+                const fromCity = cities.find(c => c.name === route[i]);
+                const toCity = cities.find(c => c.name === route[i+1]);
+                
+                if (fromCity && toCity) {
+                    const fromPos = project(fromCity.lng, fromCity.lat);
+                    const toPos = project(toCity.lng, toCity.lat);
+                    
+                    // Создаем линию маршрута
+                    const line = document.createElement('div');
+                    line.className = 'route-line';
+                    
+                    // Вычисляем длину и угол линии
+                    const dx = toPos.x - fromPos.x;
+                    const dy = toPos.y - fromPos.y;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    
+                    // Устанавливаем стили линии
+                    line.style.width = `${length}px`;
+                    line.style.left = `${fromPos.x}px`;
+                    line.style.top = `${fromPos.y}px`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    
+                    map.appendChild(line);
+                }
+            }
+            
+            // Добавляем самолет для анимации
+            const plane = document.createElement('div');
+            plane.className = 'plane-icon';
+            map.appendChild(plane);
+            
+            // Анимируем движение самолета по маршруту
+            animatePlane(plane, route, 0);
+        }
+
+        // Анимация движения самолета по маршруту
+        function animatePlane(plane, route, index) {
+            if (index >= route.length - 1) return;
+            
+            const map = document.getElementById('map');
+            const project = map.project;
+            
+            const fromCity = cities.find(c => c.name === route[index]);
+            const toCity = cities.find(c => c.name === route[index+1]);
+            
+            if (!fromCity || !toCity) return;
+            
+            const fromPos = project(fromCity.lng, fromCity.lat);
+            const toPos = project(toCity.lng, toCity.lat);
+            
+            const duration = 1000; // Продолжительность анимации между городами (мс)
+            const startTime = performance.now();
+            
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Позиция самолета
+                const x = fromPos.x + (toPos.x - fromPos.x) * progress;
+                const y = fromPos.y + (toPos.y - fromPos.y) * progress;
+                
+                plane.style.left = `${x}px`;
+                plane.style.top = `${y}px`;
+                
+                // Угол поворота самолета
+                const dx = toPos.x - fromPos.x;
+                const dy = toPos.y - fromPos.y;
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                plane.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    // Переходим к следующему отрезку маршрута
+                    animatePlane(plane, route, index + 1);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // Показ результатов расчета
+        function showResults(route, planeCapacity) {
+            const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
+                city: item.querySelector('.destination-city').value,
+                weight: parseInt(item.querySelector('.weight').value)
+            }));
+            
+            // Рассчитываем общий вес
+            const totalWeight = deliveries.reduce((sum, d) => sum + d.weight, 0);
+            
+            // Рассчитываем общее расстояние
+            let totalDistance = 0;
+            for (let i = 0; i < route.length - 1; i++) {
+                totalDistance += distanceMatrix[route[i]][route[i+1]];
+            }
+            
+            // Разделяем доставки на рейсы с учетом грузоподъемности
+            let flights = [];
+            let currentFlight = { cities: [route[0]], weight: 0, distance: 0 };
+            
+            for (let i = 1; i < route.length - 1; i++) {
+                const city = route[i];
+                const cityWeight = deliveries.filter(d => d.city === city).reduce((sum, d) => sum + d.weight, 0);
+                
+                if (currentFlight.weight + cityWeight <= planeCapacity) {
+                    currentFlight.cities.push(city);
+                    currentFlight.weight += cityWeight;
+                } else {
+                    // Завершаем текущий рейс и начинаем новый
+                    currentFlight.cities.push(route[0]);
+                    flights.push(currentFlight);
+                    currentFlight = { cities: [route[0], city], weight: cityWeight, distance: 0 };
+                }
+            }
+            
+            // Добавляем последний рейс
+            if (currentFlight.cities.length > 1) {
+                currentFlight.cities.push(route[0]);
+                flights.push(currentFlight);
+            }
+            
+            // Рассчитываем расстояние для каждого рейса
+            flights.forEach(flight => {
+                flight.distance = 0;
+                for (let i = 0; i < flight.cities.length - 1; i++) {
+                    flight.distance += distanceMatrix[flight.cities[i]][flight.cities[i+1]];
+                }
+            });
+            
+            // Общее время доставки (предполагаем среднюю скорость 500 км/ч + 1 час на обработку в каждом аэропорту)
+            const avgSpeed = 500; // км/ч
+            const processingTime = 1; // час на аэропорт
+            const totalTime = flights.reduce((sum, flight) => {
+                return sum + (flight.distance / avgSpeed) + (flight.cities.length * processingTime);
+            }, 0);
+            
+            // Примерная стоимость (предполагаем 100 руб/км)
+            const costPerKm = 100;
+            const totalCost = flights.reduce((sum, flight) => sum + flight.distance * costPerKm, 0);
+            
+            // Форматируем маршрут для отображения
+            const formattedRoute = flights.map((flight, idx) => {
+                return `Рейс ${idx+1}: ${flight.cities.join(' → ')} (${flight.distance} км, ${flight.weight} кг)`;
+            }).join('<br>');
+            
+            // Заполняем результаты
+            document.getElementById('total-weight').textContent = totalWeight;
+            document.getElementById('flights-count').textContent = flights.length;
+            document.getElementById('total-distance').textContent = totalDistance;
+            document.getElementById('delivery-time').textContent = Math.round(totalTime * 10) / 10;
+            document.getElementById('delivery-cost').textContent = totalCost.toLocaleString('ru-RU');
+            document.getElementById('optimal-route').innerHTML = formattedRoute;
+            
+            // Показываем блок результатов
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        // Инициализация приложения при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initDistanceMatrix();
+            initUI();
+        });
+    </script>
+</body>
+</html>
