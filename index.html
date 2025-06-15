@@ -325,6 +325,53 @@
             display: none;
         }
 
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links, .footer-contacts {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        footer h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        footer a {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .footer-copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
         /* Мобильная версия */
         @media (max-width: 1080px) {
             .header-content {
@@ -511,6 +558,43 @@
             </div>
         </div>
     </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <h3>Полезные ссылки</h3>
+                    <a href="https://translated.turbopages.org/proxy_u/en-ru.ru.1f95b4fe-684eb5e8-dd487bda-74722d776562/https/en.wikipedia.org/wiki/Trajectory_optimization" target="_blank">
+                        Оптимизация маршрутов
+                    </a>
+                    <a href="https://ru.wikipedia.org/wiki/Логистика" target="_blank">
+                        Основы логистики
+                    </a>
+                    <a href="https://ru.wikipedia.org/wiki/Метод_роя_частиц" target="_blank">
+                        О методе PSO
+                    </a>
+                </div>
+                <div class="footer-contacts">
+                    <h3>Автор проекта</h3>
+                    <a href="https://github.com/JustKesha/postal-route-optimization" target="_blank">
+                        Исходный код проекта
+                    </a>
+                    <a href="https://github.com/JustKesha" target="_blank">
+                        Мой GitHub
+                    </a>
+                    <a href="mailto:sazonovilya03@mail.ru">
+                        Email для связи
+                    </a>
+                    <a href="https://t.me/MangoAvocadoSalad" target="_blank">
+                        Telegram
+                    </a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                © 2025 Илья Сазонов - Оптимизация авиамаршрутов для почтовых отправлений
+            </div>
+        </div>
+    </footer>
 
     <script>
         // База данных городов с их координатами (для визуализации)
