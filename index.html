@@ -193,6 +193,11 @@
             background-color: #3e8e41;
         }
 
+        .btn-icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
         #map {
             width: 100%;
             height: 400px;
@@ -328,10 +333,15 @@
                                 <!-- Города будут добавлены через JS -->
                             </select>
                             <input type="number" class="weight" min="1" value="100" placeholder="Вес">
-                            <button class="remove-btn noselect">×</button>
+                            <button class="remove-btn noselect">
+                                ✕
+                            </button>
                         </div>
                     </div>
                     <button id="add-destination" class="add-btn noselect custom-font">
+                        <div class="btn-icon">
+                            ✚
+                        </div>
                         Добавить пункт
                     </button>
                 </div>
@@ -349,7 +359,12 @@
                     </select>
                 </div>
 
-                <button id="build-route" class="noselect custom-font">Построить маршрут</button>
+                <button id="build-route" class="noselect custom-font">
+                    <div class="btn-icon">
+                        ✓
+                    </div>
+                    Построить маршрут
+                </button>
             </div>
 
             <div class="visualization-section">
