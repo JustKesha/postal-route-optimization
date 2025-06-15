@@ -47,9 +47,28 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
             color: var(--primary-color);
             font-size: 24px;
             font-weight: bold;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .header-links a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         h1 {
@@ -203,8 +222,12 @@
             border-radius: var(--border-radius);
         }
 
+        .result-items {
+            margin-top: 15px;
+        }
+
         .result-item {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .result-item strong {
@@ -239,13 +262,31 @@
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo">Почта России - Оптимизация авиамаршрутов</div>
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#0054a6"/>
+                    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="#0054a6"/>
+                    <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#0054a6"/>
+                </svg>
+                Оптимизация авиамаршрутов
+            </div>
+            <div class="header-links">
+                <a href="https://translated.turbopages.org/proxy_u/en-ru.ru.1f95b4fe-684eb5e8-dd487bda-74722d776562/https/en.wikipedia.org/wiki/Trajectory_optimization" target="_blank">
+                    Оптимизация маршрутов
+                </a>
+                <a href="https://ru.wikipedia.org/wiki/Логистика" target="_blank">
+                    Основы логистики
+                </a>
+                <a href="https://ru.wikipedia.org/wiki/Метод_роя_частиц" target="_blank">
+                    О методе PSO
+                </a>
+            </div>
         </div>
     </header>
 
     <div class="container">
         <h1>Оптимизация маршрутов авиарейсов для почтовых отправлений</h1>
-        <p class="description">Используйте роевой интеллект для построения оптимальных маршрутов доставки почтовых отправлений</p>
+        <p class="description">Используйте роевой интеллект для построения оптимальных маршрутов доставки почтовых отправлений!</p>
 
         <div class="app-container">
             <div class="input-section">
@@ -294,12 +335,14 @@
                 </div>
                 <div id="results" class="results hidden">
                     <h3>Результаты оптимизации маршрута</h3>
-                    <div class="result-item"><strong>Общий вес:</strong> <span id="total-weight">0</span> кг</div>
-                    <div class="result-item"><strong>Количество рейсов:</strong> <span id="flights-count">0</span></div>
-                    <div class="result-item"><strong>Общее расстояние:</strong> <span id="total-distance">0</span> км</div>
-                    <div class="result-item"><strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов</div>
-                    <div class="result-item"><strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.</div>
-                    <div class="result-item"><strong>Оптимальный маршрут:</strong> <span id="optimal-route"></span></div>
+                    <div class="result-items">
+                        <div class="result-item"><strong>Общий вес:</strong> <span id="total-weight">0</span> кг</div>
+                        <div class="result-item"><strong>Количество рейсов:</strong> <span id="flights-count">0</span></div>
+                        <div class="result-item"><strong>Общее расстояние:</strong> <span id="total-distance">0</span> км</div>
+                        <div class="result-item"><strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов</div>
+                        <div class="result-item"><strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.</div>
+                        <div class="result-item"><strong>Оптимальный маршрут:</strong> <span id="optimal-route"></span></div>
+                    </div>
                 </div>
             </div>
         </div>
