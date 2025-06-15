@@ -165,6 +165,18 @@
             background-color: #003d7a;
         }
 
+        .delivery-param-tags {
+            opacity: .75;
+        }
+
+        .delivery-param-tag-1 {
+            margin-right: 6px;
+        }
+
+        .delivery-param-tag-2 {
+            margin-right: 11px;
+        }
+
         .delivery-item {
             display: flex;
             gap: 10px;
@@ -379,13 +391,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Пункты назначения и вес отправлений (кг):</label>
+                    <label>Параметры отправлений:</label>
                     <div id="deliveries-container">
+                        <div class="delivery-param-tags">
+                            <span class="delivery-param-tag-1">П. Назначения</span>
+                            <span class="delivery-param-tag-2">Габариты (м³)</span>
+                            <span class="delivery-param-tag-3">Вес (кг)</span>
+                        </div>
                         <div class="delivery-item">
-                            <select class="destination-city noselect">
+                            <select class="destination-city">
                                 <!-- Города будут добавлены через JS -->
                             </select>
-                            <input type="number" class="weight" min="1" value="100" placeholder="Вес">
+                            <select class="size">
+                                <option value="small">Маленький (0.1 м³)</option>
+                                <option value="medium" selected>Средний (0.3 м³)</option>
+                                <option value="large">Большой (0.6 м³)</option>
+                                <option value="xlarge">Очень большой (1 м³)</option>
+                            </select>
+                            <input type="number" class="weight" min="1" value="100" placeholder="Вес (кг)">
                             <button class="remove-btn noselect">
                                 ✕
                             </button>
@@ -402,6 +425,16 @@
                 <div class="form-group">
                     <label for="plane-capacity">Грузоподъемность самолета (кг):</label>
                     <input type="number" id="plane-capacity" min="100" value="1000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="plane-volume">Вместимость самолета (м³):</label>
+                    <select id="plane-volume">
+                        <option value="10">Малый (10 м³)</option>
+                        <option value="30" selected>Средний (30 м³)</option>
+                        <option value="60">Большой (60 м³)</option>
+                        <option value="100">Очень большой (100 м³)</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -498,6 +531,14 @@
             { name: "Тольятти", lat: 53.5078, lng: 49.4204, airport: "Курумоч" },
             { name: "Ижевск", lat: 56.8527, lng: 53.2115, airport: "Ижевск" }
         ];
+        
+        // Размеры посылок (м³)
+        const packageSizes = {
+            small: 0.1,
+            medium: 0.3,
+            large: 0.6,
+            xlarge: 1
+        };
 
         // Матрица расстояний между городами (в км)
         // В реальном приложении можно было бы вычислять расстояния по координатам
@@ -635,7 +676,7 @@
         }
 
         // Роевой алгоритм оптимизации (Particle Swarm Optimization)
-        function psoAlgorithm(startCity, destinations, planeCapacity) {
+        function psoAlgorithm(startCity, destinations, planeCapacity, planeVolume) {
             // Параметры алгоритма
             const swarmSize = 50;
             const iterations = 100;
@@ -643,50 +684,82 @@
             const cognitiveWeight = 1.5;
             const socialWeight = 1.5;
             
-            // Преобразуем destinations в массив объектов {city, weight}
+            // Получаем данные о посылках
             const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
                 city: item.querySelector('.destination-city').value,
-                weight: parseInt(item.querySelector('.weight').value)
+                weight: parseInt(item.querySelector('.weight').value),
+                size: packageSizes[item.querySelector('.size').value]
             }));
             
-            // Все города, которые нужно посетить (без дубликатов и без стартового города)
-            const uniqueCities = [...new Set(deliveries.map(d => d.city))].filter(city => city !== startCity);
+            // Группируем посылки по городам
+            const cityDeliveries = {};
+            deliveries.forEach(delivery => {
+                if (!cityDeliveries[delivery.city]) {
+                    cityDeliveries[delivery.city] = {
+                        weight: 0,
+                        size: 0,
+                        count: 0
+                    };
+                }
+                cityDeliveries[delivery.city].weight += delivery.weight;
+                cityDeliveries[delivery.city].size += delivery.size;
+                cityDeliveries[delivery.city].count++;
+            });
             
-            // Генерация случайного маршрута (только промежуточные города)
+            const deliveryCities = Object.keys(cityDeliveries);
+            
+            // Генерация случайного маршрута
             function randomRoute() {
-                const route = [...uniqueCities];
+                const route = [...deliveryCities];
+                // Shuffle only the intermediate cities
                 for (let i = route.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [route[i], route[j]] = [route[j], route[i]];
                 }
-                return route;
+                // Always start and end at startCity
+                return [startCity, ...route, startCity];
             }
             
             // Расчет стоимости маршрута (чем меньше, тем лучше)
-            function calculateCost(intermediateRoute) {
-                // Полный маршрут: стартовый город -> промежуточные -> стартовый
-                const fullRoute = [startCity, ...intermediateRoute, startCity];
-                
-                let totalDistance = 0;
-                for (let i = 0; i < fullRoute.length - 1; i++) {
-                    totalDistance += distanceMatrix[fullRoute[i]][fullRoute[i+1]];
-                }
-                
-                // Разделяем доставки на рейсы с учетом грузоподъемности
+            function calculateCost(route) {
+                // Ensure route starts and ends at startCity
+                if (route[0] !== startCity) route.unshift(startCity);
+                if (route[route.length - 1] !== startCity) route.push(startCity);
+
+                // Разделяем доставки на рейсы с учетом грузоподъемности и объема
                 let flights = [];
-                let currentFlight = { cities: [startCity], weight: 0 };
+                let currentFlight = {
+                    cities: [startCity],
+                    weight: 0,
+                    volume: 0,
+                    packages: 0
+                };
                 
-                for (const city of intermediateRoute) {
-                    const cityWeight = deliveries.filter(d => d.city === city).reduce((sum, d) => sum + d.weight, 0);
-                    
-                    if (currentFlight.weight + cityWeight <= planeCapacity) {
-                        currentFlight.cities.push(city);
-                        currentFlight.weight += cityWeight;
+                for (let i = 1; i < route.length - 1; i++) {
+                    const city = route[i];
+                    if (cityDeliveries[city]) {
+                        const cityData = cityDeliveries[city];
+                        
+                        if (currentFlight.weight + cityData.weight <= planeCapacity &&
+                            currentFlight.volume + cityData.size <= planeVolume) {
+                            // Add city to current flight
+                            currentFlight.cities.push(city);
+                            currentFlight.weight += cityData.weight;
+                            currentFlight.volume += cityData.size;
+                            currentFlight.packages += cityData.count;
+                        } else {
+                            // Complete current flight and start new one
+                            currentFlight.cities.push(startCity);
+                            flights.push(currentFlight);
+                            currentFlight = {
+                                cities: [startCity, city],
+                                weight: cityData.weight,
+                                volume: cityData.size,
+                                packages: cityData.count
+                            };
+                        }
                     } else {
-                        // Завершаем текущий рейс и начинаем новый
-                        currentFlight.cities.push(startCity);
-                        flights.push(currentFlight);
-                        currentFlight = { cities: [startCity, city], weight: cityWeight };
+                        // console.warn(`No delivery data found for city: ${city}`);
                     }
                 }
                 
@@ -696,33 +769,48 @@
                     flights.push(currentFlight);
                 }
                 
+                // Рассчитываем общее расстояние
+                let totalDistance = 0;
+                flights.forEach(flight => {
+                    flight.distance = 0;
+                    for (let i = 0; i < flight.cities.length - 1; i++) {
+                        flight.distance += distanceMatrix[flight.cities[i]][flight.cities[i+1]];
+                    }
+                    totalDistance += flight.distance;
+                });
+                
                 // Штрафуем за количество рейсов (чтобы алгоритм старался минимизировать их)
                 const flightsPenalty = flights.length * 500; // 500 км штрафа за каждый дополнительный рейс
                 
-                return totalDistance + flightsPenalty;
+                return {
+                    cost: totalDistance + flightsPenalty,
+                    flights: flights
+                };
             }
             
             // Инициализация роя
             let swarm = [];
-            let globalBest = { route: null, cost: Infinity };
+            let globalBest = { route: null, cost: Infinity, flights: [] };
             
             for (let i = 0; i < swarmSize; i++) {
-                const intermediateRoute = randomRoute();
-                const cost = calculateCost(intermediateRoute);
+                const route = randomRoute();
+                const result = calculateCost(route);
                 
                 const particle = {
-                    route: intermediateRoute,
-                    cost: cost,
-                    bestRoute: [...intermediateRoute],
-                    bestCost: cost,
-                    velocity: Array(intermediateRoute.length).fill(0)
+                    route: route,
+                    cost: result.cost,
+                    bestRoute: [...route],
+                    bestCost: result.cost,
+                    velocity: Array(route.length).fill(0),
+                    flights: result.flights
                 };
                 
                 swarm.push(particle);
                 
-                if (cost < globalBest.cost) {
-                    globalBest.route = [...intermediateRoute];
-                    globalBest.cost = cost;
+                if (result.cost < globalBest.cost) {
+                    globalBest.route = [...route];
+                    globalBest.cost = result.cost;
+                    globalBest.flights = result.flights;
                 }
             }
             
@@ -741,86 +829,156 @@
                     
                     // Обновляем позицию (маршрут)
                     const newRoute = [...particle.route];
-                    for (let i = 0; i < newRoute.length; i++) {
+                    for (let i = 1; i < newRoute.length - 1; i++) {  // Skip first and last elements
                         if (Math.random() < particle.velocity[i]) {
-                            // Случайным образом меняем местами два города
-                            const j = Math.floor(Math.random() * newRoute.length);
+                            // Only swap intermediate cities
+                            const j = Math.floor(Math.random() * (newRoute.length - 2)) + 1;
                             [newRoute[i], newRoute[j]] = [newRoute[j], newRoute[i]];
                         }
                     }
                     
                     // Проверяем новый маршрут
-                    const newCost = calculateCost(newRoute);
+                    const newResult = calculateCost(newRoute);
                     
-                    if (newCost < particle.bestCost) {
+                    if (newResult.cost < particle.bestCost) {
                         particle.bestRoute = [...newRoute];
-                        particle.bestCost = newCost;
+                        particle.bestCost = newResult.cost;
+                        particle.flights = newResult.flights;
                     }
                     
-                    if (newCost < globalBest.cost) {
+                    if (newResult.cost < globalBest.cost) {
                         globalBest.route = [...newRoute];
-                        globalBest.cost = newCost;
+                        globalBest.cost = newResult.cost;
+                        globalBest.flights = newResult.flights;
                     }
                     
                     particle.route = newRoute;
-                    particle.cost = newCost;
+                    particle.cost = newResult.cost;
+                    particle.flights = newResult.flights;
                 }
             }
             
-            // Возвращаем полный маршрут: стартовый город -> оптимальные промежуточные -> стартовый
-            return [startCity, ...globalBest.route, startCity];
+            return globalBest;
         }
-        
+                
         // Построение маршрута
         function buildRoute() {
             const startCity = document.getElementById('start-city').value;
             const planeCapacity = parseInt(document.getElementById('plane-capacity').value);
+            const planeVolume = parseInt(document.getElementById('plane-volume').value);
             const algorithm = document.getElementById('algorithm').value;
             
-            // Показываем индикатор загрузки
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('results').classList.add('hidden');
-            
-            // Очищаем предыдущие маршруты на карте
             clearMap();
             
-            // Имитируем задержку вычислений для демонстрации
             setTimeout(() => {
-                let optimalRoute;
+                let result;
                 
                 if (algorithm === 'pso') {
-                    optimalRoute = psoAlgorithm(startCity, [], planeCapacity);
+                    result = psoAlgorithm(startCity, [], planeCapacity, planeVolume);
                 } else {
-                    // Простой жадный алгоритм как запасной вариант
-                    optimalRoute = greedyAlgorithm(startCity, [], planeCapacity);
+                    result = greedyAlgorithm(startCity, [], planeCapacity, planeVolume);
                 }
                 
-                // Визуализируем маршрут
-                visualizeRoute(optimalRoute);
+                // Ensure we have a valid route before visualization
+                if (result && result.route && result.route.length) {
+                    visualizeRoute(result.route);
+                    showResults(result, planeCapacity, planeVolume);
+                } else {
+                    console.error("Failed to generate valid route");
+                    document.getElementById('optimal-route').textContent = "Не удалось построить маршрут";
+                    document.getElementById('results').classList.remove('hidden');
+                }
                 
-                // Рассчитываем и показываем результаты
-                showResults(optimalRoute, planeCapacity);
-                
-                // Скрываем индикатор загрузки
                 document.getElementById('loading').classList.add('hidden');
             }, 1500);
         }
 
         // Простой жадный алгоритм (в качестве альтернативы)
-        function greedyAlgorithm(startCity, destinations, planeCapacity) {
+        function greedyAlgorithm(startCity, destinations, planeCapacity, planeVolume) {
             const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
                 city: item.querySelector('.destination-city').value,
-                weight: parseInt(item.querySelector('.weight').value)
+                weight: parseInt(item.querySelector('.weight').value),
+                size: packageSizes[item.querySelector('.size').value]
             }));
-            
-            const uniqueCities = [...new Set(deliveries.map(d => d.city))];
-            
-            // Просто сортируем города по расстоянию от стартового
-            const sortedCities = [...uniqueCities].sort((a, b) => {
+
+            // Group deliveries by city
+            const cityDeliveries = {};
+            deliveries.forEach(delivery => {
+                if (!cityDeliveries[delivery.city]) {
+                    cityDeliveries[delivery.city] = {
+                        weight: 0,
+                        size: 0,
+                        count: 0
+                    };
+                }
+                cityDeliveries[delivery.city].weight += delivery.weight;
+                cityDeliveries[delivery.city].size += delivery.size;
+                cityDeliveries[delivery.city].count++;
+            });
+
+            const deliveryCities = Object.keys(cityDeliveries);
+
+            // Simple greedy approach - sort by distance from start city
+            const sortedCities = [...deliveryCities].sort((a, b) => {
                 return distanceMatrix[startCity][a] - distanceMatrix[startCity][b];
             });
-            
-            return [startCity, ...sortedCities, startCity];
+
+            // Build flights considering capacity and volume
+            let flights = [];
+            let currentFlight = {
+                cities: [startCity],
+                weight: 0,
+                volume: 0,
+                packages: 0
+            };
+
+            for (const city of sortedCities) {
+                const cityData = cityDeliveries[city];
+                
+                if (currentFlight.weight + cityData.weight <= planeCapacity &&
+                    currentFlight.volume + cityData.size <= planeVolume) {
+                    currentFlight.cities.push(city);
+                    currentFlight.weight += cityData.weight;
+                    currentFlight.volume += cityData.size;
+                    currentFlight.packages += cityData.count;
+                } else {
+                    currentFlight.cities.push(startCity);
+                    flights.push(currentFlight);
+                    currentFlight = {
+                        cities: [startCity, city],
+                        weight: cityData.weight,
+                        volume: cityData.size,
+                        packages: cityData.count
+                    };
+                }
+            }
+
+            // Add last flight
+            if (currentFlight.cities.length > 1) {
+                currentFlight.cities.push(startCity);
+                flights.push(currentFlight);
+            }
+
+            // Calculate total route (for visualization)
+            const totalRoute = [startCity];
+            flights.forEach(flight => {
+                totalRoute.push(...flight.cities.slice(1, -1));
+            });
+            totalRoute.push(startCity);
+
+            return {
+                route: totalRoute,
+                flights: flights,
+                cost: flights.reduce((sum, flight) => {
+                    flight.distance = 0;
+                    for (let i = 0; i < flight.cities.length - 1; i++) {
+                        flight.distance += distanceMatrix[flight.cities[i]][flight.cities[i+1]];
+                    }
+                    return sum + flight.distance;
+                }, 0)
+            };
         }
 
         // Очистка карты от предыдущих маршрутов
@@ -832,10 +990,24 @@
 
         // Визуализация маршрута на карте
         function visualizeRoute(route) {
+            // Ensure route is valid
+            if (!route || !route.length) {
+                console.error("Invalid route provided for visualization");
+                return;
+            }
+
             const map = document.getElementById('map');
+            if (!map.project) {
+                console.error("Map projection function not found");
+                return;
+            }
+
             const project = map.project;
             
-            // Рисуем линии маршрута
+            // Clear previous routes
+            clearMap();
+
+            // Draw route lines
             for (let i = 0; i < route.length - 1; i++) {
                 const fromCity = cities.find(c => c.name === route[i]);
                 const toCity = cities.find(c => c.name === route[i+1]);
@@ -844,17 +1016,17 @@
                     const fromPos = project(fromCity.lng, fromCity.lat);
                     const toPos = project(toCity.lng, toCity.lat);
                     
-                    // Создаем линию маршрута
+                    // Create route line
                     const line = document.createElement('div');
                     line.className = 'route-line';
                     
-                    // Вычисляем длину и угол линии
+                    // Calculate line length and angle
                     const dx = toPos.x - fromPos.x;
                     const dy = toPos.y - fromPos.y;
                     const length = Math.sqrt(dx * dx + dy * dy);
                     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                     
-                    // Устанавливаем стили линии
+                    // Set line styles
                     line.style.width = `${length}px`;
                     line.style.left = `${fromPos.x}px`;
                     line.style.top = `${fromPos.y}px`;
@@ -864,13 +1036,13 @@
                 }
             }
             
-            // Добавляем самолет для анимации
-            const plane = document.createElement('div');
-            plane.className = 'plane-icon';
-            map.appendChild(plane);
-            
-            // Анимируем движение самолета по маршруту
-            animatePlane(plane, route, 0);
+            // Add plane animation if route has at least 2 points
+            if (route.length >= 2) {
+                const plane = document.createElement('div');
+                plane.className = 'plane-icon';
+                map.appendChild(plane);
+                animatePlane(plane, route, 0);
+            }
         }
 
         // Анимация движения самолета по маршруту
@@ -920,68 +1092,30 @@
         }
 
         // Показ результатов расчета
-        function showResults(route, planeCapacity) {
-            const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
-                city: item.querySelector('.destination-city').value,
-                weight: parseInt(item.querySelector('.weight').value)
-            }));
+        function showResults(result, planeCapacity, planeVolume) {
+            const flights = result.flights;
             
-            // Рассчитываем общий вес
-            const totalWeight = deliveries.reduce((sum, d) => sum + d.weight, 0);
+            // Рассчитываем общий вес и объем
+            const totalWeight = flights.reduce((sum, flight) => sum + flight.weight, 0);
+            const totalVolume = flights.reduce((sum, flight) => sum + flight.volume, 0);
             
             // Рассчитываем общее расстояние
-            let totalDistance = 0;
-            for (let i = 0; i < route.length - 1; i++) {
-                totalDistance += distanceMatrix[route[i]][route[i+1]];
-            }
+            const totalDistance = flights.reduce((sum, flight) => sum + flight.distance, 0);
             
-            // Разделяем доставки на рейсы с учетом грузоподъемности
-            let flights = [];
-            let currentFlight = { cities: [route[0]], weight: 0, distance: 0 };
-            
-            for (let i = 1; i < route.length - 1; i++) {
-                const city = route[i];
-                const cityWeight = deliveries.filter(d => d.city === city).reduce((sum, d) => sum + d.weight, 0);
-                
-                if (currentFlight.weight + cityWeight <= planeCapacity) {
-                    currentFlight.cities.push(city);
-                    currentFlight.weight += cityWeight;
-                } else {
-                    // Завершаем текущий рейс и начинаем новый
-                    currentFlight.cities.push(route[0]);
-                    flights.push(currentFlight);
-                    currentFlight = { cities: [route[0], city], weight: cityWeight, distance: 0 };
-                }
-            }
-            
-            // Добавляем последний рейс
-            if (currentFlight.cities.length > 1) {
-                currentFlight.cities.push(route[0]);
-                flights.push(currentFlight);
-            }
-            
-            // Рассчитываем расстояние для каждого рейса
-            flights.forEach(flight => {
-                flight.distance = 0;
-                for (let i = 0; i < flight.cities.length - 1; i++) {
-                    flight.distance += distanceMatrix[flight.cities[i]][flight.cities[i+1]];
-                }
-            });
-            
-            // Общее время доставки (предполагаем среднюю скорость 500 км/ч + 1 час на обработку в каждом аэропорту)
+            // Общее время доставки
             const avgSpeed = 500; // км/ч
             const processingTime = 1; // час на аэропорт
             const totalTime = flights.reduce((sum, flight) => {
                 return sum + (flight.distance / avgSpeed) + (flight.cities.length * processingTime);
             }, 0);
             
-            // Примерная стоимость (предполагаем 100 руб/км)
+            // Примерная стоимость
             const costPerKm = 100;
             const totalCost = flights.reduce((sum, flight) => sum + flight.distance * costPerKm, 0);
             
             // Форматируем маршрут для отображения
             const formattedRoute = flights.map((flight, idx) => {
-                return `Рейс ${idx+1}: ${flight.cities.join(' → ')} (${flight.distance} км, ${flight.weight} кг)`;
+                return `Рейс ${idx+1}: ${flight.cities.join(' → ')} (${flight.distance} км, ${flight.weight} кг, ${flight.volume.toFixed(1)} м³)`;
             }).join('<br>');
             
             // Заполняем результаты
