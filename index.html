@@ -253,20 +253,8 @@
             border-radius: var(--border-radius);
         }
 
-        .result-items {
-            margin-top: 15px;
-        }
-
-        .result-item {
-            margin-bottom: 5px;
-        }
-
         .result-item strong {
             color: var(--primary-color);
-        }
-
-        .hidden {
-            display: none;
         }
 
         .loading {
@@ -282,6 +270,47 @@
             height: 30px;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
+        }
+
+        .result-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 7.5px;
+        }
+
+        .result-icon {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            color: var(--primary-color);
+            opacity: 0.9;
+            margin-top: 2px;
+            transform: translateY(-3.5px);
+        }
+
+        .result-text {
+            flex-grow: 1;
+            line-height: 1.4;
+        }
+
+        #optimal-route {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 8px;
+            background-color: rgba(0, 84, 166, 0.1);
+            border-radius: var(--border-radius);
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
         }
 
         @keyframes spin {
@@ -378,12 +407,45 @@
                 <div id="results" class="results hidden">
                     <h3>Результаты оптимизации маршрута</h3>
                     <div class="result-items">
-                        <div class="result-item"><strong>Общий вес:</strong> <span id="total-weight">0</span> кг</div>
-                        <div class="result-item"><strong>Количество рейсов:</strong> <span id="flights-count">0</span></div>
-                        <div class="result-item"><strong>Общее расстояние:</strong> <span id="total-distance">0</span> км</div>
-                        <div class="result-item"><strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов</div>
-                        <div class="result-item"><strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.</div>
-                        <div class="result-item"><strong>Оптимальный маршрут:</strong> <span id="optimal-route"></span></div>
+                        <div class="result-item">
+                            <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z"/></g></svg>
+                            <div class="result-text">
+                                <strong>Общий вес:</strong> <span id="total-weight">0</span> кг
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.36 18.78L6.61 21l1.62-1.54l2.77-7.6c-.68-.17-1.28-.51-1.77-.98zm8.41-7.9c-.49.47-1.1.81-1.77.98l2.77 7.6L17.39 21l.26-2.22zm.17-2.28c.3-1.56-.6-2.94-1.94-3.42V4c0-.55-.45-1-1-1s-1 .45-1 1v1.18C9.84 5.6 9 6.7 9 8c0 1.84 1.66 3.3 3.56 2.95c1.18-.22 2.15-1.17 2.38-2.35M12 9c-.55 0-1-.45-1-1s.45-1 1-1s1 .45 1 1s-.45 1-1 1"/></svg>
+                            <div class="result-text">
+                                <strong>Общее расстояние:</strong> <span id="total-distance">0</span> км
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 4.5v4.667a.6.6 0 0 1-.282.51l-7.436 4.647a.6.6 0 0 0-.282.508v.9a.6.6 0 0 0 .746.582l6.508-1.628a.6.6 0 0 1 .746.582v2.96a.6.6 0 0 1-.205.451l-2.16 1.89c-.458.402-.097 1.151.502 1.042l3.256-.591a.6.6 0 0 1 .214 0l3.256.591c.599.11.96-.64.502-1.041l-2.16-1.89a.6.6 0 0 1-.205-.452v-2.96a.6.6 0 0 1 .745-.582l6.51 1.628a.6.6 0 0 0 .745-.582v-.9a.6.6 0 0 0-.282-.508l-7.436-4.648a.6.6 0 0 1-.282-.509V4.5a1.5 1.5 0 0 0-3 0"/></svg>
+                            <div class="result-text">
+                                <strong>Количество рейсов:</strong> <span id="flights-count">0</span>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <svg class="result-icon" viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V9m9-3l-2-2m-9-2h4m-2 19a8 8 0 1 1 0-16a8 8 0 0 1 0 16"/>
+                            </svg>
+                            <div class="result-text">
+                                <strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><circle cx="12" cy="12" r="3"/><path d="M2 9a4 4 0 0 0 4-4v0m12 14a4 4 0 0 1 4-4v0"/></g></svg>
+                            <div class="result-text">
+                                <strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.016 4.502A2.976 2.976 0 0 0 3.038 7.48c0 2.233 2.978 5.53 2.978 5.53s2.978-3.297 2.978-5.53a2.976 2.976 0 0 0-2.978-2.978m0 4.041A1.063 1.063 0 1 1 7.079 7.48a1.064 1.064 0 0 1-1.063 1.063m15.008 2.753v-4.3a4.962 4.962 0 0 0-.204-1.333a4.996 4.996 0 0 0-9.796 1.216v.248l-.01.87v9.952h-.004v.041a2 2 0 0 1-4 0c0-.012.003-.024.004-.037H7.01V16.01h-2v2h.002a3.998 3.998 0 0 0 7.996-.005h.002v-.982h.005V8.997l.01-1.87V6.88a3.001 3.001 0 0 1 6 .123v4.275a1.999 1.999 0 1 0 2 .018"/></svg>
+                            <div class="result-text">
+                                <strong>Оптимальный маршрут:</strong><br>
+                                <span id="optimal-route"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
