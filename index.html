@@ -953,6 +953,17 @@
         // Построение маршрута
         function buildRoute() {
             const startCity = document.getElementById('start-city').value;
+            const destinations = Array.from(document.querySelectorAll('.destination-city')).map(el => el.value);
+            
+            // Check if all destinations are the same as start city
+            if (destinations.every(city => city === startCity)) {
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('optimal-route').innerHTML = 
+                    "Ошибка: Все пункты назначения совпадают с городом отправления";
+                document.getElementById('loading').classList.add('hidden');
+                return;
+            }
+            
             const planeCapacity = parseInt(document.getElementById('plane-capacity').value);
             const planeVolume = parseInt(document.getElementById('plane-volume').value);
             const algorithm = document.getElementById('algorithm').value;
