@@ -313,6 +313,28 @@
             display: none;
         }
 
+        /* Мобильная версия */
+        @media (max-width: 1080px) {
+            .header-content {
+                display: block;
+                padding-bottom: 0;
+            }
+
+            .logo {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Очень маленькие экраны */
+        @media (max-width: 600px) {
+            .header-links {
+                display: block;
+            }
+            .header-links a {
+                display: block;
+            }
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
