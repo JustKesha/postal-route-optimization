@@ -438,6 +438,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="plane-capacity">Стоимость перелета (за 1 км):</label>
+                    <input type="number" id="flight-cost" min="0" value="100">
+                </div>
+
+                <div class="form-group">
                     <label for="algorithm">Алгоритм оптимизации:</label>
                     <select id="algorithm" class="noselect">
                         <option value="pso">Роевой алгоритм (PSO)</option>
@@ -1110,7 +1115,7 @@
             }, 0);
             
             // Примерная стоимость
-            const costPerKm = 100;
+            const costPerKm = document.getElementById('flight-cost').value;
             const totalCost = flights.reduce((sum, flight) => sum + flight.distance * costPerKm, 0);
             
             // Форматируем маршрут для отображения
