@@ -4,6 +4,9 @@
 
 Проект представляет собой простое [веб-приложение](https://justkesha.github.io/postal-route-optimization/) для построения оптимальных маршрутов доставки почтовых отправлений авиатранспортом с применением алгоритмов роевого интеллекта.
 
+[![Сайт](https://img.shields.io/badge/Сайт-Работает-green?logo=github)](https://justkesha.github.io/postal-route-optimization)
+[![Лицензия: MIT](https://img.shields.io/badge/Лицензия-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Содержание
 1. [Математическая модель](#математическая-модель)
 2. [Алгоритмы оптимизации](#алгоритмы-оптимизации)
