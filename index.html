@@ -491,6 +491,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="plane-capacity">Скорость перелета (км/ч):</label>
+                    <input type="number" id="flight-speed" min="0" value="800">
+                </div>
+
+                <div class="form-group">
+                    <label for="plane-capacity">Время разгрузки (ч):</label>
+                    <input type="number" id="processing-time" min="0" value="1">
+                </div>
+
+                <div class="form-group">
                     <label for="algorithm">Алгоритм оптимизации:</label>
                     <select id="algorithm" class="noselect">
                         <option value="pso">Роевой алгоритм (PSO)</option>
@@ -1204,8 +1214,8 @@
             const totalDistance = flights.reduce((sum, flight) => sum + flight.distance, 0);
             
             // Общее время доставки
-            const avgSpeed = 500; // км/ч
-            const processingTime = 1; // час на аэропорт
+            const avgSpeed = document.getElementById('flight-speed').value; // км/ч
+            const processingTime = document.getElementById('processing-time').value; // час на аэропорт
             const totalTime = flights.reduce((sum, flight) => {
                 return sum + (flight.distance / avgSpeed) + (flight.cities.length * processingTime);
             }, 0);
