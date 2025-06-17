@@ -115,7 +115,7 @@
 
         .input-section {
             flex: 1;
-            min-width: 300px;
+            min-width: 400px;
             background-color: white;
             padding: 20px;
             border-radius: var(--border-radius);
@@ -124,7 +124,7 @@
 
         .visualization-section {
             flex: 2;
-            min-width: 220px;
+            min-width: 400px;
             background-color: white;
             padding: 20px;
             border-radius: var(--border-radius);
@@ -168,31 +168,31 @@
         .delivery-param-tags {
             opacity: .75;
         }
-
-        .delivery-param-tag-1 {
-            margin-right: 6px;
-        }
-
-        .delivery-param-tag-2 {
-            margin-right: 11px;
-        }
-
+        
+        .delivery-param-tags,
         .delivery-item {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
 
+        .delivery-param-tag-1,
+        .delivery-param-tag-2,
         .delivery-item select {
             flex: 2;
         }
 
+        .delivery-param-tag-3,
         .delivery-item input {
             flex: 1;
         }
 
+        .delivery-param-tag-4,
         .remove-btn {
             flex: 0 0 45px;
+        }
+
+        .remove-btn {
             background-color: #ff4444;
             height: 45px;
             margin: 0;
@@ -444,6 +444,7 @@
                             <span class="delivery-param-tag-1">П. Назначения</span>
                             <span class="delivery-param-tag-2">Габариты (м³)</span>
                             <span class="delivery-param-tag-3">Вес (кг)</span>
+                            <span class="delivery-param-tag-4"></span>
                         </div>
                         <div class="delivery-item">
                             <select class="destination-city">
