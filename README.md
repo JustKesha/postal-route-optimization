@@ -4,6 +4,8 @@
 [![Языки: RU](https://img.shields.io/badge/Языки-RU-red.svg)](#)
 [![Лицензия: MIT](https://img.shields.io/badge/Лицензия-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+[Translate into English?](README_ENG.md)
+
 <img alt="Banner" width="100%" src="preview.png" />
 
 Проект представляет собой простое [веб-приложение](https://justkesha.github.io/postal-route-optimization/) для построения оптимальных маршрутов доставки почтовых отправлений авиатранспортом с применением алгоритмов роевого интеллекта.
