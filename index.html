@@ -1,11 +1,18 @@
+<!-- Код программы -->
+
 <!DOCTYPE html>
 <html lang="ru">
+
+<!-- CSS стили и подготовка приложения -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Название и иконка приложения -->
     <title>Оптимизация авиамаршрутов для почтовых отправлений</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <!-- CSS стили -->
     <style>
+        /* CSS переменные для единого дизайна */
         :root {
             --primary-color: #0054a6; /* Основной синий цвет */
             --secondary-color: #e6f0fa; /* Светло-синий фон */
@@ -14,44 +21,56 @@
             --border-radius: 8px; /* Скругление углов */
             --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тень элементов */
         }
-
-        * {
+        /* Сброс стилей по умолчанию */
+        * { 
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        /* Кастомный шрифт Raleway */
         .custom-font {
             font-family: "Raleway", sans-serif;
             font-optical-sizing: auto;
         }
-
+        /* Класс для отключения выделения текста пользователем */
+        .noselect {
+        -webkit-touch-callout: none; /* iOS Safari - отключение вызова контекстного меню */
+            -webkit-user-select: none; /* Safari - запрет выделения текста */
+            -khtml-user-select: none; /* Konqueror HTML - запрет выделения текста */
+            -moz-user-select: none; /* Старые версии Firefox - запрет выделения текста */
+                -ms-user-select: none; /* Internet Explorer/Edge - запрет выделения текста */
+                    user-select: none; /* Стандартное свойство, поддерживается Chrome, Edge, Opera и Firefox */
+        }
+        /* Фон и настройка текста */
         body {
             background-color: #f9f9f9;
             color: var(--text-color);
             line-height: 1.6;
         }
 
+        /* Основные стили приложения */
+
+        /* Контейнер с ограничением ширины и центрированием */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
+        /* Шапка приложения */
         header {
             background-color: white;
             padding: 20px 0;
             box-shadow: var(--box-shadow);
             margin-bottom: 30px;
         }
-
+        /* Содержимое шапки - flex контейнер */
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
+        /* Логотип в шапке */
         .logo {
             display: flex;
             align-items: center;
@@ -59,17 +78,7 @@
             font-size: 24px;
             font-weight: 700;
         }
-
-        .noselect {
-        -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Old versions of Firefox */
-                -ms-user-select: none; /* Internet Explorer/Edge */
-                    user-select: none; /* Non-prefixed version, currently
-                                        supported by Chrome, Edge, Opera and Firefox */
-        }
-        
+        /* Иконка логотипа с фильтром для изменения цвета */
         .logo-svg {
             width: 32px;
             height: 32px;
@@ -77,42 +86,40 @@
             transform: scale(1.2);
             margin-right: 15px;
         }
-
+        /* Ссылки в шапке */
         .header-links {
             display: flex;
             gap: 20px;
         }
-
         .header-links a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
             transition: opacity 0.3s;
         }
-
         .header-links a:hover {
             opacity: 0.8;
             text-decoration: underline;
         }
-
+        /* Заголовок страницы */
         h1 {
             color: var(--primary-color);
             margin-bottom: 20px;
             text-align: center;
         }
-
+        /* Описание под заголовком */
         .description {
             text-align: center;
             margin-bottom: 30px;
             color: var(--light-text);
         }
-
+        /* Основной контейнер приложения - две колонки */
         .app-container {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
-
+        /* Секция ввода параметров */
         .input-section {
             flex: 1;
             min-width: 400px;
@@ -121,7 +128,7 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
         }
-
+        /* Секция визуализации маршрута */
         .visualization-section {
             flex: 2;
             min-width: 400px;
@@ -132,17 +139,17 @@
             display: flex;
             flex-direction: column;
         }
-
+        /* Группа полей формы */
         .form-group {
             margin-bottom: 15px;
         }
-
+        /* Подписи полей */
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
         }
-
+        /* Общие стили для полей ввода и кнопок */
         select, input, button {
             width: 100%;
             padding: 10px;
@@ -150,7 +157,7 @@
             border-radius: var(--border-radius);
             font-size: 16px;
         }
-
+        /* Стили кнопок */
         button {
             background-color: var(--primary-color);
             color: white;
@@ -160,58 +167,56 @@
             transition: background-color 0.3s;
             margin-top: 10px;
         }
-
         button:hover {
             background-color: #003d7a;
         }
-
+        /* Заголовки параметров доставки */
         .delivery-param-tags {
             opacity: .75;
         }
-        
+        /* Контейнеры для параметров доставки */
         .delivery-param-tags,
         .delivery-item {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
-
+        /* Широкие поля (город назначения, габариты) */
         .delivery-param-tag-1,
         .delivery-param-tag-2,
         .delivery-item select {
             flex: 2;
         }
-
+        /* Узкие поля (вес) */
         .delivery-param-tag-3,
         .delivery-item input {
             flex: 1;
         }
-
+        /* Фиксированная ширина для кнопки удаления */
         .delivery-param-tag-4,
         .remove-btn {
             flex: 0 0 45px;
         }
-
+        /* Кнопка удаления пункта доставки */
         .remove-btn {
             background-color: #ff4444;
             height: 45px;
             margin: 0;
         }
-
+        /* Кнопка добавления пункта доставки */
         .add-btn {
             margin-top: 0;
             background-color: #4CAF50;
         }
-
         .add-btn:hover {
             background-color: #3e8e41;
         }
-
+        /* Иконка в кнопке */
         .btn-icon {
             display: inline-block;
             margin-right: 5px;
         }
-
+        /* Контейнер карты */
         #map {
             width: 100%;
             height: 400px;
@@ -221,7 +226,7 @@
             position: relative;
             overflow: hidden;
         }
-
+        /* Точка города на карте */
         .city-point {
             position: absolute;
             width: 12px;
@@ -230,7 +235,7 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
-
+        /* Подпись города на карте */
         .city-label {
             position: absolute;
             font-size: 12px;
@@ -239,7 +244,7 @@
             border-radius: 3px;
             pointer-events: none;
         }
-
+        /* Линия маршрута на карте */
         .route-line {
             position: absolute;
             height: 2px;
@@ -247,7 +252,7 @@
             transform-origin: left center;
             z-index: 1;
         }
-
+        /* Иконка самолета на карте */
         .plane-icon {
             position: absolute;
             width: 16px;
@@ -257,23 +262,22 @@
             z-index: 2;
             transform: translate(-50%, -50%);
         }
-
+        /* Блок результатов расчета */
         .results {
             margin-top: 20px;
             padding: 15px;
             background-color: var(--secondary-color);
             border-radius: var(--border-radius);
         }
-
         .result-item strong {
             color: var(--primary-color);
         }
-
+        /* Блок загрузки */
         .loading {
             text-align: center;
             padding: 20px;
         }
-
+        /* Спиннер загрузки */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
@@ -283,20 +287,20 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
         }
-
+        /* Контейнер элементов результатов */
         .result-items {
             display: flex;
             flex-direction: column;
             gap: 8px;
             margin-top: 20px;
         }
-
+        /* Отдельный элемент результата */
         .result-item {
             display: flex;
             align-items: flex-start;
             gap: 7.5px;
         }
-
+        /* Иконка в элементе результата */
         .result-icon {
             flex-shrink: 0;
             width: 26px;
@@ -306,12 +310,12 @@
             margin-top: 2px;
             transform: translateY(-3.5px);
         }
-
+        /* Текст результата */
         .result-text {
             flex-grow: 1;
             line-height: 1.4;
         }
-
+        /* Блок оптимального маршрута */
         #optimal-route {
             display: inline-block;
             margin-top: 6px;
@@ -320,18 +324,18 @@
             border-radius: var(--border-radius);
             line-height: 1.5;
         }
-
+        /* Класс для скрытия элементов */
         .hidden {
             display: none;
         }
-
+        /* Подвал приложения */
         footer {
             background-color: var(--primary-color);
             color: white;
             padding: 30px 0;
             margin-top: 40px;
         }
-        
+        /* Содержимое подвала */
         .footer-content {
             display: flex;
             justify-content: space-between;
@@ -339,18 +343,16 @@
             gap: 30px;
             margin-bottom: 20px;
         }
-        
+        /* Колонки в подвале */
         .footer-links, .footer-contacts {
             flex: 1;
             min-width: 200px;
         }
-        
         footer h3 {
             color: white;
             margin-bottom: 15px;
             font-size: 18px;
         }
-        
         footer a {
             display: block;
             color: rgba(255, 255, 255, 0.8);
@@ -358,12 +360,11 @@
             text-decoration: none;
             transition: color 0.3s;
         }
-        
         footer a:hover {
             color: white;
             text-decoration: underline;
         }
-        
+        /* Копирайт в подвале */
         .footer-copyright {
             text-align: center;
             padding-top: 20px;
@@ -371,71 +372,76 @@
             color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
         }
-
-        /* Мобильная версия */
+        /* Адаптивность для планшетов (экраны до 1080px) */
         @media (max-width: 1080px) {
+            /* Шапка переходит в вертикальную компоновку */
             .header-content {
                 display: block;
                 padding-bottom: 0;
             }
-
+            /* Добавляем отступ под логотипом */
             .logo {
                 margin-bottom: 20px;
             }
         }
-
-        /* Очень маленькие экраны */
+        /* Адаптивность для мобильных устройств (экраны до 600px) */
         @media (max-width: 600px) {
+            /* Ссылки в шапке располагаются вертикально */
             .header-links {
                 display: block;
             }
-
             .header-links a {
                 display: block;
             }
-
+            /* Убираем фиксированную ширину для пустой колонки заголовков */
             .delivery-param-tag-4 {
                 flex: 0;
             }
-
+            /* Убираем минимальную ширину секций для лучшей адаптации */
             .visualization-section,
             .input-section {
                 min-width: 0;
             }
-
+            /* Устанавливаем минимальную ширину только для секции визуализации */
             .visualization-section {
                 min-width: 250px;
             }
-
+            /* Контейнер приложения переходит в вертикальную компоновку */
             .app-container {
                 display: block;
             }
-
+            /* Убираем верхний отступ контейнера */
             .container {
                 padding-top: 0;
             }
-
+            /* Уменьшаем расстояние между элементами параметров доставки */
             .delivery-param-tags {
                 gap: 2px;
             }
         }
-
+        /* Анимация вращения спиннера */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
     </style>
+    <!-- Подключение шрифта Raleway -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
+
+<!-- Основной HTML контент и JS код приложения -->
 <body>
+    <!-- Шапка приложения -->
     <header>
         <div class="container header-content">
+            <!-- Логотип и название -->
             <div class="logo noselect custom-font">
                 <img src="icon.svg" alt="Самолет" class="logo-svg">
                 Оптимизация авиамаршрутов
             </div>
+            <!-- Ссылки на дополнительные ресурсы -->
             <div class="header-links">
                 <a href="https://translated.turbopages.org/proxy_u/en-ru.ru.1f95b4fe-684eb5e8-dd487bda-74722d776562/https/en.wikipedia.org/wiki/Trajectory_optimization" target="_blank">
                     Оптимизация маршрутов
@@ -450,12 +456,16 @@
         </div>
     </header>
 
+    <!-- Основной контент -->
     <div class="container">
         <h1 class="custom-font">Оптимизация маршрутов авиарейсов для почтовых отправлений</h1>
         <p class="description custom-font">Используйте роевой интеллект для построения оптимальных маршрутов доставки почтовых отправлений!</p>
 
+        <!-- Контейнер приложения: форма ввода и визуализация -->
         <div class="app-container">
+            <!-- Секция ввода параметров -->
             <div class="input-section">
+                <!-- Выбор города отправления -->
                 <div class="form-group">
                     <label for="start-city">Город отправления:</label>
                     <select id="start-city" class="noselect">
@@ -463,15 +473,18 @@
                     </select>
                 </div>
 
+                <!-- Параметры посылок для доставки -->
                 <div class="form-group">
                     <label>Параметры отправлений:</label>
                     <div id="deliveries-container">
+                        <!-- Заголовки колонок -->
                         <div class="delivery-param-tags">
                             <span class="delivery-param-tag-1">П. Назначения</span>
                             <span class="delivery-param-tag-2">Габариты (м³)</span>
                             <span class="delivery-param-tag-3">Вес (кг)</span>
                             <span class="delivery-param-tag-4"></span>
                         </div>
+                        <!-- Элемент доставки (можно добавлять несколько) -->
                         <div class="delivery-item">
                             <select class="destination-city">
                                 <!-- Города будут добавлены через JS -->
@@ -488,6 +501,7 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Кнопка добавления нового пункта доставки -->
                     <button id="add-destination" class="add-btn noselect custom-font">
                         <div class="btn-icon">
                             ✚
@@ -496,6 +510,7 @@
                     </button>
                 </div>
 
+                <!-- Параметры самолета -->
                 <div class="form-group">
                     <label for="plane-capacity">Грузоподъемность рейса (кг):</label>
                     <input type="number" id="plane-capacity" min="100" value="1000">
@@ -511,6 +526,7 @@
                     </select>
                 </div>
 
+                <!-- Параметры расчета стоимости и времени -->
                 <div class="form-group">
                     <label for="plane-capacity">Стоимость перелета (за 1 км):</label>
                     <input type="number" id="flight-cost" min="0" value="100">
@@ -526,6 +542,7 @@
                     <input type="number" id="processing-time" min="0" value="1">
                 </div>
 
+                <!-- Выбор алгоритма оптимизации -->
                 <div class="form-group">
                     <label for="algorithm">Алгоритм оптимизации:</label>
                     <select id="algorithm" class="noselect">
@@ -534,6 +551,7 @@
                     </select>
                 </div>
 
+                <!-- Кнопка запуска расчета маршрута -->
                 <button id="build-route" class="noselect custom-font">
                     <div class="btn-icon">
                         ✓
@@ -542,33 +560,41 @@
                 </button>
             </div>
 
+            <!-- Секция визуализации результатов -->
             <div class="visualization-section">
+                <!-- Карта с маршрутом -->
                 <div id="map"></div>
+                <!-- Индикатор загрузки -->
                 <div id="loading" class="loading hidden">
                     <div class="spinner"></div>
                     <p>Идет расчет оптимального маршрута...</p>
                 </div>
+                <!-- Блок с результатами расчета -->
                 <div id="results" class="results hidden">
                     <h3>Результаты оптимизации маршрута</h3>
                     <div class="result-items">
+                        <!-- Общий вес всех посылок -->
                         <div class="result-item">
                             <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z"/></g></svg>
                             <div class="result-text">
                                 <strong>Общий вес:</strong> <span id="total-weight">0</span> кг
                             </div>
                         </div>
+                        <!-- Общее расстояние маршрута -->
                         <div class="result-item">
                             <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.36 18.78L6.61 21l1.62-1.54l2.77-7.6c-.68-.17-1.28-.51-1.77-.98zm8.41-7.9c-.49.47-1.1.81-1.77.98l2.77 7.6L17.39 21l.26-2.22zm.17-2.28c.3-1.56-.6-2.94-1.94-3.42V4c0-.55-.45-1-1-1s-1 .45-1 1v1.18C9.84 5.6 9 6.7 9 8c0 1.84 1.66 3.3 3.56 2.95c1.18-.22 2.15-1.17 2.38-2.35M12 9c-.55 0-1-.45-1-1s.45-1 1-1s1 .45 1 1s-.45 1-1 1"/></svg>
                             <div class="result-text">
                                 <strong>Общее расстояние:</strong> <span id="total-distance">0</span> км
                             </div>
                         </div>
+                        <!-- Количество рейсов -->
                         <div class="result-item">
                             <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 4.5v4.667a.6.6 0 0 1-.282.51l-7.436 4.647a.6.6 0 0 0-.282.508v.9a.6.6 0 0 0 .746.582l6.508-1.628a.6.6 0 0 1 .746.582v2.96a.6.6 0 0 1-.205.451l-2.16 1.89c-.458.402-.097 1.151.502 1.042l3.256-.591a.6.6 0 0 1 .214 0l3.256.591c.599.11.96-.64.502-1.041l-2.16-1.89a.6.6 0 0 1-.205-.452v-2.96a.6.6 0 0 1 .745-.582l6.51 1.628a.6.6 0 0 0 .745-.582v-.9a.6.6 0 0 0-.282-.508l-7.436-4.648a.6.6 0 0 1-.282-.509V4.5a1.5 1.5 0 0 0-3 0"/></svg>
                             <div class="result-text">
                                 <strong>Количество рейсов:</strong> <span id="flights-count">0</span>
                             </div>
                         </div>
+                        <!-- Время доставки -->
                         <div class="result-item">
                             <svg class="result-icon" viewBox="0 0 24 24" width="24" height="24">
                                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V9m9-3l-2-2m-9-2h4m-2 19a8 8 0 1 1 0-16a8 8 0 0 1 0 16"/>
@@ -577,12 +603,14 @@
                                 <strong>Примерное время доставки:</strong> <span id="delivery-time">0</span> часов
                             </div>
                         </div>
+                        <!-- Стоимость доставки -->
                         <div class="result-item">
                             <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><circle cx="12" cy="12" r="3"/><path d="M2 9a4 4 0 0 0 4-4v0m12 14a4 4 0 0 1 4-4v0"/></g></svg>
                             <div class="result-text">
                                 <strong>Примерная стоимость:</strong> <span id="delivery-cost">0</span> руб.
                             </div>
                         </div>
+                        <!-- Детали оптимального маршрута -->
                         <div class="result-item">
                             <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.016 4.502A2.976 2.976 0 0 0 3.038 7.48c0 2.233 2.978 5.53 2.978 5.53s2.978-3.297 2.978-5.53a2.976 2.976 0 0 0-2.978-2.978m0 4.041A1.063 1.063 0 1 1 7.079 7.48a1.064 1.064 0 0 1-1.063 1.063m15.008 2.753v-4.3a4.962 4.962 0 0 0-.204-1.333a4.996 4.996 0 0 0-9.796 1.216v.248l-.01.87v9.952h-.004v.041a2 2 0 0 1-4 0c0-.012.003-.024.004-.037H7.01V16.01h-2v2h.002a3.998 3.998 0 0 0 7.996-.005h.002v-.982h.005V8.997l.01-1.87V6.88a3.001 3.001 0 0 1 6 .123v4.275a1.999 1.999 0 1 0 2 .018"/></svg>
                             <div class="result-text">
@@ -596,9 +624,11 @@
         </div>
     </div>
 
+    <!-- Подвал приложения -->
     <footer>
         <div class="container">
             <div class="footer-content">
+                <!-- Колонка с полезными ссылками -->
                 <div class="footer-links">
                     <h3>Полезные ссылки</h3>
                     <a href="https://translated.turbopages.org/proxy_u/en-ru.ru.1f95b4fe-684eb5e8-dd487bda-74722d776562/https/en.wikipedia.org/wiki/Trajectory_optimization" target="_blank">
@@ -611,6 +641,7 @@
                         О методе PSO
                     </a>
                 </div>
+                <!-- Колонка с контактами автора -->
                 <div class="footer-contacts">
                     <h3>Автор проекта</h3>
                     <a href="https://github.com/JustKesha/postal-route-optimization" target="_blank">
@@ -627,14 +658,17 @@
                     </a>
                 </div>
             </div>
+            <!-- Копирайт -->
             <div class="footer-copyright">
                 © 2025 Илья Сазонов - Оптимизация авиамаршрутов для почтовых отправлений
             </div>
         </div>
     </footer>
 
+    <!-- JS код приложения -->
     <script>
-        // База данных городов с их координатами (для визуализации)
+        // База данных городов с их координатами для визуализации на карте
+        // Каждый город содержит: название, широту, долготу и название аэропорта
         const cities = [
             { name: "Москва", lat: 55.7558, lng: 37.6173, airport: "Шереметьево" },
             { name: "Санкт-Петербург", lat: 59.9343, lng: 30.3351, airport: "Пулково" },
@@ -658,7 +692,7 @@
             { name: "Ижевск", lat: 56.8527, lng: 53.2115, airport: "Ижевск" }
         ];
         
-        // Размеры посылок (м³)
+        // Справочник размеров посылок в кубических метрах - Используется для расчета объема груза при планировании рейсов
         const packageSizes = {
             small: 0.1,
             medium: 0.3,
@@ -666,70 +700,88 @@
             xlarge: 1
         };
 
-        // Матрица расстояний между городами (в км)
-        // В реальном приложении можно было бы вычислять расстояния по координатам
+        // Матрица расстояний между всеми парами городов в километрах - Вычисляется при инициализации на основе координат городов
         const distanceMatrix = {};
 
-        // Инициализация матрицы расстояний
+        // Инициализация матрицы расстояний между всеми городами - Заполняет двумерный объект, где ключи - названия городов, значения - расстояния в км
         function initDistanceMatrix() {
+            // Проходим по всем парам городов
             for (let i = 0; i < cities.length; i++) {
+                // Создаем объект для хранения расстояний от текущего города до всех остальных
                 distanceMatrix[cities[i].name] = {};
                 for (let j = 0; j < cities.length; j++) {
                     if (i === j) {
+                        // Расстояние от города до самого себя равно нулю
                         distanceMatrix[cities[i].name][cities[j].name] = 0;
                     } else {
-                        // Вычисляем примерное расстояние по координатам (упрощенная формула)
-                        const lat1 = cities[i].lat;
-                        const lng1 = cities[i].lng;
-                        const lat2 = cities[j].lat;
-                        const lng2 = cities[j].lng;
+                        // Вычисляем примерное расстояние по координатам используя формулу гаверсинусов
+                        // Это дает точное расстояние по дуге большого круга на поверхности Земли
+                        const lat1 = cities[i].lat; // Широта первого города
+                        const lng1 = cities[i].lng; // Долгота первого города
+                        const lat2 = cities[j].lat; // Широта второго города
+                        const lng2 = cities[j].lng; // Долгота второго города
                         
                         // Формула гаверсинусов для расчета расстояния между точками на сфере
-                        const R = 6371; // Радиус Земли в км
+                        // Используется для вычисления кратчайшего расстояния между двумя точками на Земле
+                        const R = 6371; // Радиус Земли в километрах
+                        // Преобразуем разницу координат в радианы
                         const dLat = (lat2 - lat1) * Math.PI / 180;
                         const dLng = (lng2 - lng1) * Math.PI / 180;
+                        // Вычисляем промежуточные значения для формулы гаверсинусов
                         const a = 
                             Math.sin(dLat/2) * Math.sin(dLat/2) +
                             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
                             Math.sin(dLng/2) * Math.sin(dLng/2);
+                        // Вычисляем центральный угол между двумя точками
                         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                        // Вычисляем расстояние, умножая радиус на центральный угол
                         const distance = R * c;
                         
+                        // Сохраняем округленное расстояние в матрицу
                         distanceMatrix[cities[i].name][cities[j].name] = Math.round(distance);
                     }
                 }
             }
         }
 
-        // Инициализация интерфейса
+        // Инициализация пользовательского интерфейса при загрузке страницы - Настраивает все элементы управления, заполняет списки городов и привязывает обработчики событий
         function initUI() {
+            // Получаем ссылки на элементы выбора городов
             const startCitySelect = document.getElementById('start-city');
             const destinationSelect = document.querySelector('.destination-city');
             
-            // Заполняем выпадающие списки городами
+            // Заполняем выпадающие списки всеми доступными городами из базы данных
+            // Создаем опции для выбора города отправления и городов назначения
             cities.forEach(city => {
+                // Создаем опцию для списка города отправления
                 const option1 = document.createElement('option');
                 option1.value = city.name;
                 option1.textContent = city.name;
                 startCitySelect.appendChild(option1);
                 
+                // Создаем опцию для списка городов назначения (клонируем для переиспользования)
                 const option2 = document.createElement('option');
                 option2.value = city.name;
                 option2.textContent = city.name;
                 destinationSelect.appendChild(option2.cloneNode(true));
             });
             
-            // Устанавливаем Москву по умолчанию
+            // Устанавливаем Москву в качестве города отправления по умолчанию
             startCitySelect.value = "Москва";
             
-            // Обработчик добавления нового пункта назначения
+            // Обработчик клика на кнопку добавления нового пункта назначения
+            // Позволяет пользователю добавить еще одну посылку для доставки
             document.getElementById('add-destination').addEventListener('click', () => {
                 const container = document.getElementById('deliveries-container');
+                // Клонируем существующий элемент с параметрами доставки
                 const newItem = document.querySelector('.delivery-item').cloneNode(true);
+                // Устанавливаем значение веса по умолчанию для нового элемента
                 newItem.querySelector('.weight').value = '100';
+                // Добавляем новый элемент в контейнер
                 container.appendChild(newItem);
                 
-                // Добавляем обработчик удаления для новой кнопки
+                // Добавляем обработчик удаления для кнопки удаления в новом элементе
+                // Проверяем, что остается хотя бы один пункт назначения
                 newItem.querySelector('.remove-btn').addEventListener('click', () => {
                     if (document.querySelectorAll('.delivery-item').length > 1) {
                         container.removeChild(newItem);
@@ -739,44 +791,51 @@
                 });
             });
             
-            // Обработчик удаления для первой кнопки
+            // Обработчик удаления для первой кнопки удаления (изначально присутствующей на странице)
+            // Предотвращает удаление последнего пункта назначения
             document.querySelector('.remove-btn').addEventListener('click', (e) => {
                 if (document.querySelectorAll('.delivery-item').length > 1) {
+                    // Удаляем элемент, содержащий кнопку, по которой кликнули
                     e.target.closest('.delivery-item').remove();
                 } else {
                     alert('Должен остаться хотя бы один пункт назначения');
                 }
             });
             
-            // Обработчик построения маршрута
+            // Обработчик клика на кнопку построения маршрута
+            // Запускает алгоритм оптимизации и отображает результаты
             document.getElementById('build-route').addEventListener('click', buildRoute);
             
-            // Инициализируем карту
+            // Инициализируем карту для визуализации маршрутов
             initMap();
         }
 
-        // Инициализация карты для визуализации
+        // Инициализация карты для визуализации маршрутов и городов - Создает визуальное представление всех городов и настраивает систему координат
         function initMap() {
             const map = document.getElementById('map');
+            // Получаем размеры контейнера карты
             const width = map.offsetWidth;
             const height = map.offsetHeight;
             
-            // Находим минимальные и максимальные координаты для масштабирования
-            const lngs = cities.map(city => city.lng);
-            const lats = cities.map(city => city.lat);
-            const minLng = Math.min(...lngs);
-            const maxLng = Math.max(...lngs);
-            const minLat = Math.min(...lats);
-            const maxLat = Math.max(...lats);
+            // Находим минимальные и максимальные координаты всех городов для масштабирования
+            // Это необходимо для корректного отображения всех городов на карте
+            const lngs = cities.map(city => city.lng); // Массив долгот всех городов
+            const lats = cities.map(city => city.lat); // Массив широт всех городов
+            const minLng = Math.min(...lngs); // Минимальная долгота
+            const maxLng = Math.max(...lngs); // Максимальная долгота
+            const minLat = Math.min(...lats); // Минимальная широта
+            const maxLat = Math.max(...lats); // Максимальная широта
             
-            // Функция для преобразования координат в пиксели на карте
+            // Преобразует географические координаты в пиксели на карте
             function project(lng, lat) {
+                // X координата с учетом отступов 20px с каждой стороны
                 const x = ((lng - minLng) / (maxLng - minLng)) * (width - 40) + 20;
+                // Y координата (инвертирована, так как в HTML Y увеличивается вниз)
                 const y = height - ((lat - minLat) / (maxLat - minLat)) * (height - 40) - 20;
                 return { x, y };
             }
             
-            // Добавляем города на карту
+            // Добавляем точки и подписи городов на карту
             cities.forEach(city => {
                 const pos = project(city.lng, city.lat);
                 
@@ -788,7 +847,7 @@
                 point.setAttribute('data-city', city.name);
                 map.appendChild(point);
                 
-                // Название города
+                // Подпись с названием города
                 const label = document.createElement('div');
                 label.className = 'city-label';
                 label.textContent = city.name;
@@ -797,34 +856,34 @@
                 map.appendChild(label);
             });
             
-            // Сохраняем функцию проекции для использования в других функциях
+            // Сохраняем функцию проекции для использования при отрисовке маршрутов
             map.project = project;
         }
 
-        // Роевой алгоритм оптимизации (Particle Swarm Optimization)
+        // Роевой алгоритм оптимизации (Particle Swarm Optimization - PSO) - Имитирует движение роя частиц для поиска оптимального маршрута
         function psoAlgorithm(startCity, destinations, planeCapacity, planeVolume) {
-            // Параметры алгоритма
-            const swarmSize = 50;
-            const iterations = 100;
-            const inertia = 0.7;
-            const cognitiveWeight = 1.5;
-            const socialWeight = 1.5;
+            // Параметры алгоритма PSO
+            const swarmSize = 50; // Количество частиц в рое
+            const iterations = 100; // Количество итераций
+            const inertia = 0.7; // Коэффициент инерции
+            const cognitiveWeight = 1.5; // Вес когнитивного компонента
+            const socialWeight = 1.5; // Вес социального компонента
             
-            // Получаем данные о посылках
+            // Получаем данные о посылках из интерфейса
             const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
                 city: item.querySelector('.destination-city').value,
                 weight: parseInt(item.querySelector('.weight').value),
                 size: packageSizes[item.querySelector('.size').value]
             }));
             
-            // Группируем посылки по городам
+            // Группируем посылки по городам назначения
             const cityDeliveries = {};
             deliveries.forEach(delivery => {
                 if (!cityDeliveries[delivery.city]) {
                     cityDeliveries[delivery.city] = {
-                        weight: 0,
-                        size: 0,
-                        count: 0
+                        weight: 0, // Общий вес посылок в город
+                        size: 0, // Общий объем посылок в город
+                        count: 0 // Количество посылок в город
                     };
                 }
                 cityDeliveries[delivery.city].weight += delivery.weight;
@@ -832,51 +891,59 @@
                 cityDeliveries[delivery.city].count++;
             });
             
+            // Получаем список всех городов, в которые нужно доставить посылки
             const deliveryCities = Object.keys(cityDeliveries);
             
-            // Генерация случайного маршрута
+            // Генерация случайного маршрута для инициализации частиц
+            // Создает случайную перестановку городов назначения
             function randomRoute() {
                 const route = [...deliveryCities];
-                // Shuffle only the intermediate cities
+                // Перемешиваем только промежуточные города (алгоритм Фишера-Йетса)
                 for (let i = route.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [route[i], route[j]] = [route[j], route[i]];
                 }
-                // Always start and end at startCity
+                // Маршрут всегда начинается и заканчивается в городе отправления
                 return [startCity, ...route, startCity];
             }
             
-            // Расчет стоимости маршрута (чем меньше, тем лучше)
+            // Расчет стоимости маршрута (чем меньше стоимость, тем лучше маршрут)
+            // Учитывает общее расстояние и количество рейсов
             function calculateCost(route) {
-                // Ensure route starts and ends at startCity
+                // Убеждаемся, что маршрут начинается и заканчивается в городе отправления
                 if (route[0] !== startCity) route.unshift(startCity);
                 if (route[route.length - 1] !== startCity) route.push(startCity);
 
-                // Разделяем доставки на рейсы с учетом грузоподъемности и объема
+                // Разделяем доставки на отдельные рейсы с учетом грузоподъемности и объема самолета
+                // Это необходимо, так как все посылки могут не поместиться в один рейс
                 let flights = [];
                 let currentFlight = {
-                    cities: [startCity],
-                    weight: 0,
-                    volume: 0,
-                    packages: 0
+                    cities: [startCity], // Маршрут текущего рейса (начинается с города отправления)
+                    weight: 0, // Текущий вес груза в рейсе
+                    volume: 0, // Текущий объем груза в рейсе
+                    packages: 0 // Количество посылок в рейсе
                 };
                 
+                // Проходим по всем городам в маршруте (кроме первого и последнего - это startCity)
                 for (let i = 1; i < route.length - 1; i++) {
                     const city = route[i];
                     if (cityDeliveries[city]) {
                         const cityData = cityDeliveries[city];
                         
+                        // Проверяем, поместится ли груз для этого города в текущий рейс
                         if (currentFlight.weight + cityData.weight <= planeCapacity &&
                             currentFlight.volume + cityData.size <= planeVolume) {
-                            // Add city to current flight
+                            // Добавляем город к текущему рейсу
                             currentFlight.cities.push(city);
                             currentFlight.weight += cityData.weight;
                             currentFlight.volume += cityData.size;
                             currentFlight.packages += cityData.count;
                         } else {
-                            // Complete current flight and start new one
+                            // Завершаем текущий рейс и начинаем новый
+                            // Текущий рейс возвращается в город отправления
                             currentFlight.cities.push(startCity);
                             flights.push(currentFlight);
+                            // Создаем новый рейс, начинающийся с города отправления и включающий текущий город
                             currentFlight = {
                                 cities: [startCity, city],
                                 weight: cityData.weight,
@@ -885,20 +952,22 @@
                             };
                         }
                     } else {
-                        // console.warn(`No delivery data found for city: ${city}`);
+                        // Предупреждение, если для города нет данных о доставках
+                        console.warn(`Не найдены данные о доставках для города: ${city}`);
                     }
                 }
                 
-                // Добавляем последний рейс
+                // Добавляем последний рейс, если в нем есть города (кроме начального)
                 if (currentFlight.cities.length > 1) {
                     currentFlight.cities.push(startCity);
                     flights.push(currentFlight);
                 }
                 
-                // Рассчитываем общее расстояние
+                // Рассчитываем общее расстояние всех рейсов
                 let totalDistance = 0;
                 flights.forEach(flight => {
                     flight.distance = 0;
+                    // Суммируем расстояния между последовательными городами в рейсе
                     for (let i = 0; i < flight.cities.length - 1; i++) {
                         flight.distance += distanceMatrix[flight.cities[i]][flight.cities[i+1]];
                     }
@@ -906,33 +975,38 @@
                 });
                 
                 // Штрафуем за количество рейсов (чтобы алгоритм старался минимизировать их)
-                const flightsPenalty = flights.length * 500; // 500 км штрафа за каждый дополнительный рейс
+                // Каждый дополнительный рейс добавляет 500 км к стоимости (эквивалент штрафа)
+                const flightsPenalty = flights.length * 500;
                 
                 return {
-                    cost: totalDistance + flightsPenalty,
-                    flights: flights
+                    cost: totalDistance + flightsPenalty, // Общая стоимость = расстояние + штраф за рейсы
+                    flights: flights // Информация о всех рейсах
                 };
             }
             
-            // Инициализация роя
+            // Инициализация роя частиц
+            // Каждая частица представляет собой возможный маршрут
             let swarm = [];
-            let globalBest = { route: null, cost: Infinity, flights: [] };
+            let globalBest = { route: null, cost: Infinity, flights: [] }; // Лучший маршрут среди всех частиц
             
+            // Создаем начальную популяцию частиц со случайными маршрутами
             for (let i = 0; i < swarmSize; i++) {
                 const route = randomRoute();
                 const result = calculateCost(route);
                 
+                // Создаем частицу с начальными параметрами
                 const particle = {
-                    route: route,
-                    cost: result.cost,
-                    bestRoute: [...route],
-                    bestCost: result.cost,
-                    velocity: Array(route.length).fill(0),
-                    flights: result.flights
+                    route: route, // Текущий маршрут частицы
+                    cost: result.cost, // Стоимость текущего маршрута
+                    bestRoute: [...route], // Лучший маршрут, найденный этой частицей
+                    bestCost: result.cost, // Стоимость лучшего маршрута частицы
+                    velocity: Array(route.length).fill(0), // Скорость частицы (влияет на изменение маршрута)
+                    flights: result.flights // Информация о рейсах для текущего маршрута
                 };
                 
                 swarm.push(particle);
                 
+                // Обновляем глобальный лучший результат, если текущий маршрут лучше
                 if (result.cost < globalBest.cost) {
                     globalBest.route = [...route];
                     globalBest.cost = result.cost;
@@ -940,59 +1014,69 @@
                 }
             }
             
-            // Основной цикл алгоритма
+            // Основной цикл алгоритма - итеративное улучшение маршрутов
             for (let iter = 0; iter < iterations; iter++) {
+                // Обновляем каждую частицу в рое
                 for (const particle of swarm) {
-                    // Обновляем скорость
+                    // Обновляем скорость частицы на основе её лучшей позиции и глобальной лучшей позиции
                     for (let i = 0; i < particle.velocity.length; i++) {
-                        const r1 = Math.random();
-                        const r2 = Math.random();
+                        const r1 = Math.random(); // Случайное число для когнитивного компонента
+                        const r2 = Math.random(); // Случайное число для социального компонента
                         
+                        // Формула обновления скорости в PSO
                         particle.velocity[i] = inertia * particle.velocity[i] +
                             cognitiveWeight * r1 * (particle.bestRoute[i] !== particle.route[i] ? 1 : 0) +
                             socialWeight * r2 * (globalBest.route[i] !== particle.route[i] ? 1 : 0);
                     }
                     
-                    // Обновляем позицию (маршрут)
+                    // Обновляем позицию (маршрут) частицы на основе её скорости
                     const newRoute = [...particle.route];
-                    for (let i = 1; i < newRoute.length - 1; i++) {  // Skip first and last elements
+                    // Изменяем только промежуточные города (не трогаем первый и последний - startCity)
+                    for (let i = 1; i < newRoute.length - 1; i++) {
                         if (Math.random() < particle.velocity[i]) {
-                            // Only swap intermediate cities
+                            // Меняем местами два промежуточных города в маршруте
                             const j = Math.floor(Math.random() * (newRoute.length - 2)) + 1;
                             [newRoute[i], newRoute[j]] = [newRoute[j], newRoute[i]];
                         }
                     }
                     
-                    // Проверяем новый маршрут
+                    // Проверяем качество нового маршрута
                     const newResult = calculateCost(newRoute);
                     
+                    // Обновляем лучшую позицию частицы, если новый маршрут лучше
                     if (newResult.cost < particle.bestCost) {
                         particle.bestRoute = [...newRoute];
                         particle.bestCost = newResult.cost;
                         particle.flights = newResult.flights;
                     }
                     
+                    // Обновляем глобальный лучший результат, если новый маршрут лучше всех
                     if (newResult.cost < globalBest.cost) {
                         globalBest.route = [...newRoute];
                         globalBest.cost = newResult.cost;
                         globalBest.flights = newResult.flights;
                     }
                     
+                    // Обновляем текущую позицию частицы
                     particle.route = newRoute;
                     particle.cost = newResult.cost;
                     particle.flights = newResult.flights;
                 }
             }
             
+            // Возвращаем лучший найденный маршрут
             return globalBest;
         }
                 
-        // Построение маршрута
+        // Построение оптимального маршрута на основе введенных пользователем данных - Вызывает выбранный алгоритм оптимизации и отображает результаты
         function buildRoute() {
+            // Получаем город отправления из интерфейса
             const startCity = document.getElementById('start-city').value;
+            // Получаем список всех городов назначения из интерфейса
             const destinations = Array.from(document.querySelectorAll('.destination-city')).map(el => el.value);
             
-            // Check if all destinations are the same as start city
+            // Проверяем, что не все пункты назначения совпадают с городом отправления
+            // Если все совпадают, маршрут построить невозможно
             if (destinations.every(city => city === startCity)) {
                 document.getElementById('results').classList.remove('hidden');
                 document.getElementById('optimal-route').innerHTML = 
@@ -1001,46 +1085,58 @@
                 return;
             }
             
+            // Получаем параметры самолета и алгоритм оптимизации из интерфейса
             const planeCapacity = parseInt(document.getElementById('plane-capacity').value);
             const planeVolume = parseInt(document.getElementById('plane-volume').value);
             const algorithm = document.getElementById('algorithm').value;
             
+            // Показываем индикатор загрузки и скрываем предыдущие результаты
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('results').classList.add('hidden');
+            // Очищаем карту от предыдущих маршрутов
             clearMap();
             
+            // Задержка для отображения индикатора загрузки во время расчета
             setTimeout(() => {
                 let result;
                 
+                // Выбираем алгоритм оптимизации в зависимости от выбора пользователя
                 if (algorithm === 'pso') {
+                    // Роевой алгоритм оптимизации (PSO)
                     result = psoAlgorithm(startCity, [], planeCapacity, planeVolume);
                 } else {
+                    // Муравьиный алгоритм оптимизации (ACO)
                     result = greedyAlgorithm(startCity, [], planeCapacity, planeVolume);
                 }
                 
-                // Ensure we have a valid route before visualization
+                // Проверяем, что алгоритм вернул валидный маршрут перед визуализацией
                 if (result && result.route && result.route.length) {
+                    // Отображаем маршрут на карте
                     visualizeRoute(result.route);
+                    // Показываем результаты расчета в интерфейсе
                     showResults(result, planeCapacity, planeVolume);
                 } else {
-                    console.error("Failed to generate valid route");
+                    // Обработка ошибки, если маршрут не был построен
+                    console.error("Не удалось сгенерировать валидный маршрут");
                     document.getElementById('optimal-route').textContent = "Не удалось построить маршрут";
                     document.getElementById('results').classList.remove('hidden');
                 }
                 
+                // Скрываем индикатор загрузки после завершения расчетов
                 document.getElementById('loading').classList.add('hidden');
-            }, 1500);
+            }, 1500); // Задержка 1.5 секунды
         }
 
-        // Простой жадный алгоритм (в качестве альтернативы)
+        // Муравьиный алгоритм оптимизации маршрута (ACO) - Сортирует города по расстоянию от точки отправления и строит маршрут последовательно
         function greedyAlgorithm(startCity, destinations, planeCapacity, planeVolume) {
+            // Получаем данные о всех посылках из интерфейса
             const deliveries = Array.from(document.querySelectorAll('.delivery-item')).map(item => ({
                 city: item.querySelector('.destination-city').value,
                 weight: parseInt(item.querySelector('.weight').value),
                 size: packageSizes[item.querySelector('.size').value]
             }));
 
-            // Group deliveries by city
+            // Группируем посылки по городам назначения
             const cityDeliveries = {};
             deliveries.forEach(delivery => {
                 if (!cityDeliveries[delivery.city]) {
@@ -1057,30 +1153,34 @@
 
             const deliveryCities = Object.keys(cityDeliveries);
 
-            // Simple greedy approach - sort by distance from start city
+            // Сортируем города по расстоянию от города отправления (ближайшие первыми)
             const sortedCities = [...deliveryCities].sort((a, b) => {
                 return distanceMatrix[startCity][a] - distanceMatrix[startCity][b];
             });
 
-            // Build flights considering capacity and volume
+            // Формируем рейсы с учетом грузоподъемности и объема самолета
             let flights = [];
             let currentFlight = {
-                cities: [startCity],
-                weight: 0,
-                volume: 0,
-                packages: 0
+                cities: [startCity], // Маршрут текущего рейса
+                weight: 0, // Текущий вес груза
+                volume: 0, // Текущий объем груза
+                packages: 0 // Количество посылок
             };
 
+            // Последовательно добавляем города в рейсы
             for (const city of sortedCities) {
                 const cityData = cityDeliveries[city];
                 
+                // Проверяем, поместится ли груз для города в текущий рейс
                 if (currentFlight.weight + cityData.weight <= planeCapacity &&
                     currentFlight.volume + cityData.size <= planeVolume) {
+                    // Добавляем город к текущему рейсу
                     currentFlight.cities.push(city);
                     currentFlight.weight += cityData.weight;
                     currentFlight.volume += cityData.size;
                     currentFlight.packages += cityData.count;
                 } else {
+                    // Завершаем текущий рейс и начинаем новый
                     currentFlight.cities.push(startCity);
                     flights.push(currentFlight);
                     currentFlight = {
@@ -1092,15 +1192,16 @@
                 }
             }
 
-            // Add last flight
+            // Добавляем последний рейс, если в нем есть города
             if (currentFlight.cities.length > 1) {
                 currentFlight.cities.push(startCity);
                 flights.push(currentFlight);
             }
 
-            // Calculate total route (for visualization)
+            // Формируем общий маршрут для визуализации
             const totalRoute = [startCity];
             flights.forEach(flight => {
+                // Добавляем все промежуточные города из рейса (без первого и последнего - startCity)
                 totalRoute.push(...flight.cities.slice(1, -1));
             });
             totalRoute.push(startCity);
@@ -1125,45 +1226,47 @@
             lines.forEach(el => el.remove());
         }
 
-        // Визуализация маршрута на карте
+        // Визуализация маршрута на карте - Отображает линии маршрута и анимирует движение самолета
         function visualizeRoute(route) {
-            // Ensure route is valid
+            // Проверяем валидность маршрута
             if (!route || !route.length) {
-                console.error("Invalid route provided for visualization");
+                console.error("Некорректный маршрут для визуализации");
                 return;
             }
 
             const map = document.getElementById('map');
+            // Проверяем наличие функции проекции координат
             if (!map.project) {
-                console.error("Map projection function not found");
+                console.error("Функция проекции карты не найдена");
                 return;
             }
 
             const project = map.project;
             
-            // Clear previous routes
+            // Очищаем предыдущие маршруты
             clearMap();
 
-            // Draw route lines
+            // Отрисовываем линии маршрута между городами
             for (let i = 0; i < route.length - 1; i++) {
                 const fromCity = cities.find(c => c.name === route[i]);
                 const toCity = cities.find(c => c.name === route[i+1]);
                 
                 if (fromCity && toCity) {
+                    // Преобразуем координаты городов в пиксели
                     const fromPos = project(fromCity.lng, fromCity.lat);
                     const toPos = project(toCity.lng, toCity.lat);
                     
-                    // Create route line
+                    // Создаем элемент линии маршрута
                     const line = document.createElement('div');
                     line.className = 'route-line';
                     
-                    // Calculate line length and angle
+                    // Вычисляем длину и угол наклона линии
                     const dx = toPos.x - fromPos.x;
                     const dy = toPos.y - fromPos.y;
                     const length = Math.sqrt(dx * dx + dy * dy);
                     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                     
-                    // Set line styles
+                    // Устанавливаем стили линии для правильного отображения
                     line.style.width = `${length}px`;
                     line.style.left = `${fromPos.x}px`;
                     line.style.top = `${fromPos.y}px`;
@@ -1173,7 +1276,7 @@
                 }
             }
             
-            // Add plane animation if route has at least 2 points
+            // Добавляем анимацию самолета, если в маршруте есть хотя бы 2 точки
             if (route.length >= 2) {
                 const plane = document.createElement('div');
                 plane.className = 'plane-icon';
@@ -1197,7 +1300,8 @@
             const fromPos = project(fromCity.lng, fromCity.lat);
             const toPos = project(toCity.lng, toCity.lat);
             
-            const duration = 1000; // Продолжительность анимации между городами (мс)
+            // Продолжительность анимации между городами в мс
+            const duration = 1000;
             const startTime = performance.now();
             
             function step(currentTime) {
