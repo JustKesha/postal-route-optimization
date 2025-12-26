@@ -42,7 +42,9 @@ The problem is a modified version of the Capacitated Vehicle Routing Problem (CV
 
 ## Optimization Algorithms
 
-### 1. Particle Swarm Optimization (PSO)
+The application implements two route optimization algorithms:
+
+### 1. Particle Swarm Optimization
 
 #### Algorithm Parameters:
 - Swarm size: 50 particles
@@ -68,9 +70,23 @@ The problem is a modified version of the Capacitated Vehicle Routing Problem (CV
 - Total route distance
 - Number of required flights (with a penalty coefficient of 500 km for each additional flight)
 
-### 2. Greedy Algorithm (for comparison)
-1. Sort cities by distance from the starting city
-2. Sequentially add the nearest cities to the route, considering payload capacity
+### 2. Ant Colony Optimization
+
+Ant Colony Optimization is a metaheuristic algorithm inspired by the behavior of ants when searching for paths between their colony and food sources.
+
+#### Implementation Features:
+- The algorithm sorts cities by distance from the starting city
+- Sequentially adds the nearest cities to the route, considering aircraft payload capacity
+- Takes into account weight and volume constraints when forming flights
+- Creates multiple flights if all packages do not fit in one aircraft
+
+#### Advantages:
+- Fast solution finding
+- Simple implementation
+- Effective for small and medium-sized problems
+
+#### Application:
+Used as an alternative to PSO for quickly obtaining an approximate solution, especially when fast route construction is required without lengthy computations.
 
 ## Distance Calculation
 
@@ -103,8 +119,10 @@ Example calculation for Moscow → Saint Petersburg:
 ### Application Structure:
 1. **Data Input Panel**:
    - Select starting city
-   - Add destination points with specified weight
-   - Configure algorithm parameters
+   - Add destination points with specified weight and dimensions
+   - Configure aircraft parameters (payload capacity, volume)
+   - Select optimization algorithm
+   - Configure calculation parameters (speed, cost, handling time)
 
 2. **Visualization**:
    - Interactive map with cities
